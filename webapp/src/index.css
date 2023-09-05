@@ -7,59 +7,55 @@
   --tg-theme-button-text-color: #fffeec;
   --tg-theme-secondary-bg-color: #f3f2f9;
 
-  --default-font: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
-    'Segoe UI Symbol';
+  --default-font: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto,
+    Helvetica, Arial, sans-serif, "Apple Color Emoji", "Segoe UI Emoji",
+    "Segoe UI Symbol";
+}
+
+* {
+  border-radius: 0px !important;
+  font-weight: bold !important;
+  font-size: 15px !important;
 }
 
 body {
   background: var(--tg-theme-secondary-bg-color);
-  padding: 20px 20px;
+  padding: 0;
   margin: 0;
-  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+  font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", "Roboto", "Oxygen",
+    "Ubuntu", "Cantarell", "Fira Sans", "Droid Sans", "Helvetica Neue",
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
     monospace;
 }
 
-.App-logo {
-  height: 40vmin;
+p {
+  margin-bottom: 2px;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
-
-.betaVersion {
-  padding: 10px 10px;
-  margin-bottom: 20px;
-  border: 1px solid #1777ff;
-}
-
-.App-header {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+small {
+  font-size: 12px !important;
 }
 
 .contentWrapper {
   background: var(--tg-theme-bg-color);
   color: var(--tg-theme-text-color) !important;
-  border-radius: 10px;
-  margin: 5px 0;
-  padding: 20px;
+  margin: 0;
+  padding: 0;
   box-sizing: border-box;
+}
+
+.contentWrapper > .ant-row {
+  padding: 15px 10px;
+}
+
+.ant-divider {
+  margin: 0px;
 }
 
 .ant-input,
@@ -68,11 +64,8 @@ code {
   background-color: unset !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.ant-radio-button-wrapper {
+  height: fit-content;
+  padding: 5px;
+  padding-inline: 25px;
 }
