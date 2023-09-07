@@ -1,25 +1,43 @@
-import React, { DispatchWithoutAction, FC, useState } from "react";
+import React, { DispatchWithoutAction, FC, useEffect, useState } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+
 import ReactDOM from "react-dom/client";
-import { WebAppProvider } from "@vkruglikov/react-telegram-web-app";
+import { WebAppProvider, useExpand } from "@vkruglikov/react-telegram-web-app";
 import "antd/dist/reset.css";
 
 import "./index.css";
 
 import { MainLayout } from "./layout/MainLayout";
 import { Trade } from "./pages/trade/Trade";
+import { Overview } from "./pages/portfolio/Overview";
+import { Deposit } from "./pages/transfer/Deposit";
+import { Withdraw } from "./pages/transfer/Withdraw";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
 const App = () => {
+  const [isExpanded, expand] = useExpand();
+
   const [smoothButtonsTransition, setSmoothButtonsTransition] = useState(true);
+
+  useEffect(() => {
+    expand();
+  }, []);
 
   return (
     <WebAppProvider options={{ smoothButtonsTransition }}>
-      <MainLayout>
-        <Trade />
-      </MainLayout>
+      <Router>
+        <MainLayout>
+          <Routes>
+            <Route path="/" element={<Overview />} />
+            <Route path="/deposit" element={<Deposit />} />
+            <Route path="/withdraw" element={<Withdraw />} />
+            <Route path="/trade" element={<Trade />} />
+          </Routes>
+        </MainLayout>
+      </Router>
     </WebAppProvider>
   );
 };

@@ -18,6 +18,23 @@
   font-size: 15px !important;
 }
 
+*::-webkit-scrollbar {
+  width: 0px;
+  height: 0px;
+}
+
+/* Chrome, Safari, Edge, Opera */
+input::-webkit-outer-spin-button,
+input::-webkit-inner-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+
+/* Firefox */
+input[type="number"] {
+  -moz-appearance: textfield;
+}
+
 body {
   background: var(--tg-theme-secondary-bg-color);
   padding: 0;
@@ -27,6 +44,11 @@ body {
     sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+h3 {
+  font-size: 25px !important;
+  margin: 10px 0px;
 }
 
 code {
@@ -54,6 +76,10 @@ small {
   padding: 15px 10px;
 }
 
+.ant-btn {
+  height: fit-content !important;
+}
+
 .ant-divider {
   margin: 0px;
 }
@@ -65,7 +91,17 @@ small {
 }
 
 .ant-radio-button-wrapper {
-  height: fit-content;
-  padding: 5px;
-  padding-inline: 25px;
+  padding-inline: 45px;
+}
+
+.ant-card-actions > li {
+  margin: 0px !important;
+}
+
+.footer {
+  position: fixed;
+  bottom: 0px;
+  width: 100vw;
+  background-color: var(--tg-theme-secondary-bg-color);
+  border-top: 0.5px solid var(--tg-theme-button-color);
 }

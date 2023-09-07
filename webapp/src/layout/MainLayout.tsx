@@ -1,5 +1,6 @@
 import { ConfigProvider, theme } from "antd";
 import { useThemeParams } from "@vkruglikov/react-telegram-web-app";
+import { Footer } from "../components/Menu/Footer";
 
 export const MainLayout = (props: any) => {
   const [colorScheme, themeParams] = useThemeParams();
@@ -23,7 +24,13 @@ export const MainLayout = (props: any) => {
             : undefined
         }
       >
-        <div className="contentWrapper">{props.children}</div>
+        <div
+          className="contentWrapper"
+          style={{ paddingBottom: "50px", minHeight: "100vh" }}
+        >
+          {props.children}
+        </div>
+        <Footer />
       </ConfigProvider>
     </div>
   );
