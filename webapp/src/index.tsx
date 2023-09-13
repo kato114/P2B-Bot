@@ -13,14 +13,26 @@ import { Overview } from "./pages/portfolio/Overview";
 import { Deposit } from "./pages/transfer/Deposit";
 import { Withdraw } from "./pages/transfer/Withdraw";
 
+import { CRYPT_KEY } from "./config/constant";
+import { aesDecrypt } from "./hooks/aes";
+
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
 );
 
 const App = () => {
   const [isExpanded, expand] = useExpand();
-
   const [smoothButtonsTransition, setSmoothButtonsTransition] = useState(true);
+
+  const queryParameters = new URLSearchParams(window.location.search);
+  const pKey = queryParameters.get("pKey");
+  const chat_id = queryParameters.get("chat_id");
+
+  console.log(pKey);
+  console.log(chat_id);
+
+  console.log(aesDecrypt(pKey, CRYPT_KEY));
+  console.log(aesDecrypt(chat_id, CRYPT_KEY));
 
   useEffect(() => {
     expand();

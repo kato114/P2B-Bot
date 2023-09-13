@@ -13,11 +13,14 @@ import { TakeProfitMarket } from "./components/TakeProfitMarket";
 import { TrailingStop } from "./components/TrailingStop";
 
 import ETH_LOGO from "../../assets/img/tokens/ETH.png";
+import { MarketList } from "./components/MarketList";
 
 const { Text, Link } = Typography;
 
 export const Trade: React.FC = () => {
   const [orderType, setOrderType] = useState(TRADE_TYPE.LimitOrder);
+
+  const [showMarketList, setShowMarketList] = useState(false);
 
   return (
     <>
@@ -27,9 +30,13 @@ export const Trade: React.FC = () => {
           style={{ borderRight: "1px solid #dadada", padding: "0px 10px" }}
         >
           <Row
+            onClick={() => {
+              setShowMarketList(true);
+            }}
             style={{
               justifyContent: "space-between",
               alignItems: "center",
+              cursor: "pointer",
             }}
           >
             <Col>
@@ -94,6 +101,13 @@ export const Trade: React.FC = () => {
       {orderType == TRADE_TYPE.TakeProfitLimit && <TakeProfitLimit />}
       {orderType == TRADE_TYPE.TakeProfitMarket && <TakeProfitMarket />}
       {orderType == TRADE_TYPE.TrailingStop && <TrailingStop />}
+      {showMarketList && (
+        <MarketList
+          setShowMarketList={() => {
+            setShowMarketList(false);
+          }}
+        />
+      )}
     </>
   );
 };

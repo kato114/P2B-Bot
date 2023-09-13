@@ -98,6 +98,17 @@ small {
   margin: 0px !important;
 }
 
+.marketList {
+  position: fixed;
+  top: 0px;
+  left: 0px;
+  min-width: 100vw;
+  min-height: 100vh;
+  background-color: var(--tg-theme-bg-color);
+  z-index: 1000;
+  padding: 15px;
+}
+
 .footer {
   position: fixed;
   bottom: 0px;
