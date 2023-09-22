@@ -14,7 +14,15 @@ import { Deposit } from "./pages/transfer/Deposit";
 import { Withdraw } from "./pages/transfer/Withdraw";
 
 import { CRYPT_KEY } from "./config/constant";
-import { aesDecrypt } from "./hooks/aes";
+
+import Web3 from "web3";
+
+import {
+  DydxClient,
+  AccountResponseObject,
+  ApiKeyCredentials,
+  UserResponseObject,
+} from "@dydxprotocol/v3-client";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -24,18 +32,35 @@ const App = () => {
   const [isExpanded, expand] = useExpand();
   const [smoothButtonsTransition, setSmoothButtonsTransition] = useState(true);
 
-  const queryParameters = new URLSearchParams(window.location.search);
-  const pKey = queryParameters.get("pKey");
-  const chat_id = queryParameters.get("chat_id");
+  // const queryParameters = new URLSearchParams(window.location.search);
+  // const pKey = queryParameters.get("pKey");
+  // const chat_id = queryParameters.get("chat_id");
 
-  console.log(pKey);
-  console.log(chat_id);
+  const HTTP_HOST = "https://api.dydx.exchange";
+  const WS_HOST = "wss://api.dydx.exchange/v3/ws";
 
-  console.log(aesDecrypt(pKey, CRYPT_KEY));
-  console.log(aesDecrypt(chat_id, CRYPT_KEY));
+  const address = "0x5Ec887916bc9b11176f3CdE97d7B22608261f774";
+
+  const web3 = new Web3();
+  const client = new DydxClient(HTTP_HOST, { web3 });
 
   useEffect(() => {
     expand();
+
+    async () => {
+      const onboardingInformation: {
+        apiKey: ApiKeyCredentials;
+        user: UserResponseObject;
+        account: AccountResponseObject;
+      } = await client.onboarding.createUser(
+        {
+          starkKey: "71234abcd",
+          starkKeyYCoordinate: "01234abcd",
+          country: "SG",
+        },
+        address
+      );
+    };
   }, []);
 
   return (

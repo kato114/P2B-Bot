@@ -4,21 +4,24 @@
   "private": false,
   "dependencies": {
     "@ant-design/icons": "^5.2.5",
+    "@dydxprotocol/v3-client": "^1.15.0",
     "@types/node": "^16.18.3",
     "@types/react": "^18.0.25",
     "@types/react-dom": "^18.0.9",
     "@vkruglikov/react-telegram-web-app": "^2.1.1",
     "antd": "^5.0.1",
+    "crypto-browserify": "^3.12.0",
     "firebase": "^10.3.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "react-router-dom": "^6.15.0",
     "react-scripts": "5.0.1",
-    "typescript": "^4.9.3"
+    "typescript": "^4.9.3",
+    "web3": "^4.1.1"
   },
   "browser": {
     "crypto": false,
-    "stream": false
+    "assert": false
   },
   "scripts": {
     "start": "react-scripts start",
