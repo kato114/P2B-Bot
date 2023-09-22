@@ -18,17 +18,27 @@ class UsersModel {
     this.pause_date = user.pause_date;
   }
 
+  static registerUser = (user_data, result) => {
+    connection.query("INSERT INTO users SET ?", user_data, (err, res) => {
+      if (err) {
+        console.log("error: ", err);
+        result(err, null);
+        return;
+      }
+
+      result(null, { id: res.insertId, ...user_data });
+    });
+  };
+
   static findUserByTelegramID(tg_id, result) {
     connection.query(
       `SELECT * FROM users WHERE tg_id = "${tg_id}"`,
       (err, res) => {
         if (err) {
-          console.log("error: ", err);
           result(err, null);
           return;
         }
         if (res.length) {
-          console.log("found user: ", res[0]);
           result(null, res[0]);
           return;
         }
@@ -38,22 +48,6 @@ class UsersModel {
     );
   }
 }
-
-// UsersModel.create = (newUsersModel, result) => {
-//   sql.query("INSERT INTO transactions SET ?", newUsersModel, (err, res) => {
-//     if (err) {
-//       console.log("error: ", err);
-//       result(err, null);
-//       return;
-//     }
-
-//     console.log("created transaction: ", {
-//       id: res.insertId,
-//       ...newUsersModel,
-//     });
-//     result(null, { id: res.insertId, ...newUsersModel });
-//   });
-// };
 
 // UsersModel.updateById = (id, transaction, result) => {
 //   sql.query(
