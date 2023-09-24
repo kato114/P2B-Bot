@@ -2,7 +2,7 @@ import axios from "axios";
 import { Web3 } from "web3";
 import { ethers } from "ethers";
 
-import { DydxClient } from "@dydxprotocol/v3-client";
+import { DydxClient, Asset, AccountAction, OrderSide, OrderType, TimeInForce, Market } from "@dydxprotocol/v3-client";
 import { generateKeyPairUnsafe } from "@dydxprotocol/starkex-lib";
 
 import {
@@ -151,16 +151,11 @@ export const deposit = async (req, res) => {
         },
         starkPrivateKey: data.stk_prvkey,
       });
+      const user = await client.private.getUser();
+      const account = await client.private.getAccount(data.eth_address);
 
       const signature = await client.private.getRegistration();
-      console.log(signature);
-
-      res.send({
-        succeed: RETURN_STATUS.FAILED,
-        message: "Server error.",
-      });
-      return;
-
+      
       const eth_balance = await getEthBalance(data.eth_address);
       const usdc_balance = await getUSDCTokenBalance(data.eth_address);
 
@@ -175,7 +170,7 @@ export const deposit = async (req, res) => {
             data.eth_prvkey,
             data.stk_pubkey,
             data.stk_posId,
-            "0x",
+            "0x", //signature.signature,
             req.body.amount
           );
 
@@ -208,6 +203,155 @@ export const deposit = async (req, res) => {
     }
   });
 };
+
+export const withdraw = async (req, res) => {
+  if (!req.params.tg_id) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+
+  UsersModel.findUserByTelegramID(req.params.tg_id, async (err, data) => {
+    if (err) {
+      if (err.kind == "not_found") {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Account was not created.",
+        });
+      } else {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Server error.",
+        });
+      }
+    } else {
+      const web3 = new Web3(WEB3_RPC_URL);
+      web3.eth.accounts.wallet.add(data.eth_prvkey);
+
+      const client = new DydxClient(DYDX_API_URL, {
+        web3: web3,
+        web3Provider: WEB3_RPC_URL,
+        networkId: NETWORK_ID,
+        apiKeyCredentials: {
+          key: data.dydx_apikey,
+          secret: data.dxdy_secret,
+          passphrase: data.dxdy_passphrase,
+        },
+        starkPrivateKey: data.stk_prvkey,
+      });
+
+      const { user } = await client.private.getUser();
+      const { account } = await client.private.getAccount(data.eth_address);
+      
+
+      const { liquidityProviders } = await client.public.getFastWithdrawals(
+        { 
+          creditAsset: Asset.USDC,
+          debitAmount: "1.5"
+        }
+      );
+
+      const lpIds = Object.keys(liquidityProviders);
+      for( let i  = 0; i < lpIds.length; i++) {
+        if(Number(liquidityProviders[lpIds[i]].availableFunds) > 1.5 
+        && liquidityProviders[lpIds[i]].quote.creditAmount > 0) {
+          const fastWithdrawal = await client.private.createFastWithdrawal(
+            {
+              creditAsset: Asset.USDC,
+              creditAmount: liquidityProviders[lpIds[i]].quote.creditAmount,
+              debitAmount: liquidityProviders[lpIds[i]].quote.debitAmount,
+              toAddress: user.ethereumAddress,
+              lpPositionId: lpIds[i],
+              signature: data.stk_prvkey,
+              expiration: '2023-10-30T22:49:31.588Z',
+            },
+            account.positionId, // positionId required for creating the fast-withdrawal signature
+          );
+          
+          console.log(fastWithdrawal)
+
+          res.send({
+            succeed: RETURN_STATUS.SUCCEED,
+            message: "Withdrawal request success.",
+          });
+          
+          return;
+        }
+      }
+
+      res.send({
+        succeed: RETURN_STATUS.FAILED,
+        message: "There is no liquidity pool for supporting withdrawal at this moment. Try again later.",
+      });
+    }
+  });
+}
+
+export const trade = async (req, res) => {
+  if (!req.params.tg_id) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+
+  UsersModel.findUserByTelegramID(req.params.tg_id, async (err, data) => {
+    if (err) {
+      if (err.kind == "not_found") {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Account was not created.",
+        });
+      } else {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Server error.",
+        });
+      }
+    } else {
+      const web3 = new Web3(WEB3_RPC_URL);
+      web3.eth.accounts.wallet.add(data.eth_prvkey);
+
+      const client = new DydxClient(DYDX_API_URL, {
+        web3: web3,
+        web3Provider: WEB3_RPC_URL,
+        networkId: NETWORK_ID,
+        apiKeyCredentials: {
+          key: data.dydx_apikey,
+          secret: data.dxdy_secret,
+          passphrase: data.dxdy_passphrase,
+        },
+        starkPrivateKey: data.stk_prvkey,
+      });
+
+      const { user } = await client.private.getUser();
+      const { account } = await client.private.getAccount(data.eth_address);
+    
+      const { markets } = await client.public.getMarkets();
+
+      const order = await client.private.createOrder(
+        {
+          market: Market.ETH_USD,
+          side: OrderSide.SELL,
+          type: OrderType.LIMIT,
+          timeInForce: TimeInForce.GTT, 
+          postOnly: false,
+          size: '100',
+          price: '18000',
+          limitFee: '0.015',
+          expiration: '2023-12-21T21:30:20.200Z',
+        },
+        account.positionId, // required for creating the order signature
+      );
+
+      console.log(order)
+
+      res.send({
+        succeed: RETURN_STATUS.SUCCEED,
+        message: "Check balance after about 5 minnutes.",
+      });
+    }
+  });
+}
 
 export const onboarding = (req, res) => {
   if (!req.body) {

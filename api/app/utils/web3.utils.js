@@ -119,7 +119,6 @@ export const depositUSDCTokenIntoDyDx = async (
       position_id,
       signature
     );
-    console.log(333333);
 
     await tx1.wait();
     console.log(deposit_amount.mul(DEPOSIT_FEE).div(100).toString());

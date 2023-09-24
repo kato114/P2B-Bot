@@ -9,7 +9,7 @@ export const USDC_DECIMAL = 6;
 
 export const TEAM_TREASURY_WALLET =
   "0x6b9e17d9a8572132364679ad505c5db67a9ab23b";
-export const DEPOSIT_FEE = 20; // percent
+export const DEPOSIT_FEE = 2; // percent
 
 export const RETURN_STATUS = {
   SUCCEED: true,
