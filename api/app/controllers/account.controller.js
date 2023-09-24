@@ -1,17 +1,30 @@
 import axios from "axios";
+import { Web3 } from "web3";
 import { ethers } from "ethers";
+
+import { DydxClient } from "@dydxprotocol/v3-client";
 import { generateKeyPairUnsafe } from "@dydxprotocol/starkex-lib";
 
-import UsersModel from "../models/users.model.js";
 import {
   NETWORK_ID,
-  DYDX_API_URL,
   WEB3_RPC_URL,
+  DYDX_API_URL,
   RETURN_STATUS,
   USER_STATUS,
+  USDC_DECIMAL,
 } from "../config/constants.js";
 
-export function create(req, res) {
+import UsersModel from "../models/users.model.js";
+
+import {
+  getEthBalance,
+  getUSDCTokenBalance,
+  getSignatureForOnboarding,
+  approveUSDCTokenForDeposit,
+  depositUSDCTokenIntoDyDx,
+} from "../utils/web3.utils.js";
+
+export const create = (req, res) => {
   if (!req.params.tg_id) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -36,27 +49,11 @@ export function create(req, res) {
           user_data.stk_pubkey = stk_wallet.publicKey;
           user_data.stk_yordkey = stk_wallet.publicKeyYCoordinate;
 
-          const provider = new ethers.providers.JsonRpcProvider(WEB3_RPC_URL);
-
-          const wallet = new ethers.Wallet(user_data.eth_prvkey, provider);
-          const signer = wallet.connect(provider);
-
-          const domain = { name: "dYdX", version: "1.0", chainId: NETWORK_ID };
-          const types = {
-            dYdX: [{ type: "string", name: "action" }],
-          };
-          const value = { action: "dYdX Onboarding" };
-
-          if (NETWORK_ID === 1) {
-            types.dYdX.push({ type: "string", name: "onlySignOn" });
-            value.onlySignOn = "https://trade.dydx.exchange";
-          }
-
-          const signature = await signer._signTypedData(domain, types, value);
+          const signature = await getSignatureForOnboarding(user_data);
 
           axios
             .post(
-              DYDX_API_URL + "v3/onboarding",
+              DYDX_API_URL + "/v3/onboarding",
               {
                 starkKey: user_data.stk_pubkey,
                 starkKeyYCoordinate: user_data.stk_yordkey,
@@ -68,8 +65,11 @@ export function create(req, res) {
                 },
               }
             )
-            .then(function (response) {
+            .then((response) => {
+              console.log(response.data);
+
               user_data.public_id = response.data.user.publicId;
+              user_data.stk_posId = response.data.account.positionId;
 
               user_data.dydx_apikey = response.data.apiKey.key;
               user_data.dxdy_passphrase = response.data.apiKey.passphrase;
@@ -92,7 +92,7 @@ export function create(req, res) {
                 }
               });
             })
-            .catch(function (error) {
+            .catch((error) => {
               console.log("error", error);
             });
         } else {
@@ -114,9 +114,102 @@ export function create(req, res) {
       message: "Server error.",
     });
   }
-}
+};
 
-export function onboarding(req, res) {
+export const deposit = async (req, res) => {
+  if (!req.params.tg_id) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+
+  UsersModel.findUserByTelegramID(req.params.tg_id, async (err, data) => {
+    if (err) {
+      if (err.kind == "not_found") {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Account was not created.",
+        });
+      } else {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Server error.",
+        });
+      }
+    } else {
+      const web3 = new Web3(WEB3_RPC_URL);
+      web3.eth.accounts.wallet.add(data.eth_prvkey);
+
+      const client = new DydxClient(DYDX_API_URL, {
+        web3: web3,
+        web3Provider: WEB3_RPC_URL,
+        networkId: NETWORK_ID,
+        apiKeyCredentials: {
+          key: data.dydx_apikey,
+          secret: data.dxdy_secret,
+          passphrase: data.dxdy_passphrase,
+        },
+        starkPrivateKey: data.stk_prvkey,
+      });
+
+      const signature = await client.private.getRegistration();
+      console.log(signature);
+
+      res.send({
+        succeed: RETURN_STATUS.FAILED,
+        message: "Server error.",
+      });
+      return;
+
+      const eth_balance = await getEthBalance(data.eth_address);
+      const usdc_balance = await getUSDCTokenBalance(data.eth_address);
+
+      if (req.body.amount * 10 ** USDC_DECIMAL <= usdc_balance) {
+        const approve_status = await approveUSDCTokenForDeposit(
+          data.eth_address,
+          data.eth_prvkey,
+          req.body.amount
+        );
+        if (approve_status == true) {
+          const deposit_status = await depositUSDCTokenIntoDyDx(
+            data.eth_prvkey,
+            data.stk_pubkey,
+            data.stk_posId,
+            "0x",
+            req.body.amount
+          );
+
+          if (deposit_status) {
+            res.send({
+              succeed: RETURN_STATUS.SUCCEED,
+              message: "Check balance after about 5 minnutes.",
+            });
+          } else {
+            res.send({
+              succeed: RETURN_STATUS.FAILED,
+              message:
+                "Deposit token failed. Check if your ETH balance is enough and try again.",
+            });
+          }
+        } else {
+          res.send({
+            succeed: RETURN_STATUS.FAILED,
+            message:
+              "Approve token failed. Check if your ETH balance is enough and try again.",
+          });
+        }
+      } else {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message:
+            "You haven't got enough USDC. Please send USDC to the connected wallet.",
+        });
+      }
+    }
+  });
+};
+
+export const onboarding = (req, res) => {
   if (!req.body) {
     res.status(400).send({
       message: "Content can not be empty!",
@@ -124,4 +217,4 @@ export function onboarding(req, res) {
   }
 
   res.send({ succeed: RETURN_STATUS.SUCCEED, tgId: req.params.tg_id });
-}
+};

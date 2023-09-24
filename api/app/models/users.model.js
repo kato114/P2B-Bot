@@ -30,7 +30,7 @@ class UsersModel {
     });
   };
 
-  static findUserByTelegramID(tg_id, result) {
+  static findUserByTelegramID = (tg_id, result) => {
     connection.query(
       `SELECT * FROM users WHERE tg_id = "${tg_id}"`,
       (err, res) => {
@@ -46,7 +46,7 @@ class UsersModel {
         result({ kind: "not_found" }, null);
       }
     );
-  }
+  };
 }
 
 // UsersModel.updateById = (id, transaction, result) => {
