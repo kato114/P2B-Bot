@@ -88,12 +88,24 @@ export const create = (req, res) => {
                   res.send({
                     succeed: RETURN_STATUS.SUCCEED,
                     message: "User created successfully.",
+                    data: {
+                      "eth_address" : user_data.eth_address,
+                      "eth_prvkey" : user_data.eth_prvkey,
+                      "eth_phrase" : user_data.eth_phrase,
+                      "stk_prvkey" : user_data.stk_prvkey,
+                      "stk_pubkey" : user_data.stk_pubkey,
+                      "stk_yordkey" : user_data.stk_yordkey,
+                    }
                   });
                 }
               });
             })
             .catch((error) => {
               console.log("error", error);
+              res.send({
+                succeed: RETURN_STATUS.FAILED,
+                message: "Server error.",
+              });
             });
         } else {
           res.send({
@@ -335,7 +347,7 @@ export const trade = async (req, res) => {
           type: OrderType.LIMIT,
           timeInForce: TimeInForce.GTT, 
           postOnly: false,
-          size: '100',
+          size: '0.0001',
           price: '18000',
           limitFee: '0.015',
           expiration: '2023-12-21T21:30:20.200Z',
