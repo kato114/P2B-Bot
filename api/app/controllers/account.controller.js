@@ -182,7 +182,7 @@ export const deposit = async (req, res) => {
             data.eth_prvkey,
             data.stk_pubkey,
             data.stk_posId,
-            "0x", //signature.signature,
+            Number(account.quoteBalance) > 0 ? "0x" : signature.signature,
             req.body.amount
           );
 
@@ -209,7 +209,7 @@ export const deposit = async (req, res) => {
         res.send({
           succeed: RETURN_STATUS.FAILED,
           message:
-            "You haven't got enough USDC. Please send USDC to the connected wallet.",
+            "You don't have enough USDC. Please send USDC to the connected wallet.",
         });
       }
     }
@@ -374,3 +374,57 @@ export const onboarding = (req, res) => {
 
   res.send({ succeed: RETURN_STATUS.SUCCEED, tgId: req.params.tg_id });
 };
+
+export const user = async (req, res) => {
+  if (!req.params.tg_id) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+  }
+
+  UsersModel.findUserByTelegramID(req.params.tg_id, async (err, data) => {
+    if (err) {
+      if (err.kind == "not_found") {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Account was not created.",
+        });
+      } else {
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Server error.",
+        });
+      }
+    } else {
+      const web3 = new Web3(WEB3_RPC_URL);
+      web3.eth.accounts.wallet.add(data.eth_prvkey);
+
+      const client = new DydxClient(DYDX_API_URL, {
+        web3: web3,
+        web3Provider: WEB3_RPC_URL,
+        networkId: NETWORK_ID,
+        apiKeyCredentials: {
+          key: data.dydx_apikey,
+          secret: data.dxdy_secret,
+          passphrase: data.dxdy_passphrase,
+        },
+        starkPrivateKey: data.stk_prvkey,
+      });
+
+      const { user } = await client.private.getUser();
+      const { account } = await client.private.getAccount(data.eth_address);
+      const profilePrivate = await client.private.getProfilePrivate();
+
+    
+      res.send({
+        succeed: RETURN_STATUS.SUCCEED,
+        message: "User is registered.",
+        data: {
+          user: user,
+          account: account,
+          profilePrivate: profilePrivate
+        }
+      });
+    }
+  });
+}
