@@ -1,5 +1,4 @@
-export const CRYPT_KEY =
-  "jkoN9HPKQz4p67BhVuNpWXnyMPBuXMIVMEBR49u60GM=:n+t9jztOTnurbYiAheMzJA==";
+export const API_URL = "http://62.72.26.77/api";
 
 export const TRADE_TYPE = {
   LimitOrder: 0,

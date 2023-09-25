@@ -1,7 +1,8 @@
-import React, { DispatchWithoutAction, FC, useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import ReactDOM from "react-dom/client";
+import axios from "axios";
 import { WebAppProvider, useExpand } from "@vkruglikov/react-telegram-web-app";
 import "antd/dist/reset.css";
 
@@ -13,16 +14,7 @@ import { Overview } from "./pages/portfolio/Overview";
 import { Deposit } from "./pages/transfer/Deposit";
 import { Withdraw } from "./pages/transfer/Withdraw";
 
-import { CRYPT_KEY } from "./config/constant";
-
-import Web3 from "web3";
-
-import {
-  DydxClient,
-  AccountResponseObject,
-  ApiKeyCredentials,
-  UserResponseObject,
-} from "@dydxprotocol/v3-client";
+import { API_URL } from "./config/constant";
 
 const root = ReactDOM.createRoot(
   document.getElementById("root") as HTMLElement
@@ -32,48 +24,75 @@ const App = () => {
   const [isExpanded, expand] = useExpand();
   const [smoothButtonsTransition, setSmoothButtonsTransition] = useState(true);
 
-  // const queryParameters = new URLSearchParams(window.location.search);
-  // const pKey = queryParameters.get("pKey");
-  // const chat_id = queryParameters.get("chat_id");
+  const [tgid, setTgid] = useState("");
+  const [userData, setUserData] = useState(undefined);
+  const [loading, setLoading] = useState(true);
 
-  const HTTP_HOST = "https://api.dydx.exchange";
-  const WS_HOST = "wss://api.dydx.exchange/v3/ws";
-
-  const address = "0x5Ec887916bc9b11176f3CdE97d7B22608261f774";
-
-  const web3 = new Web3();
-  const client = new DydxClient(HTTP_HOST, { web3 });
+  const queryParameters = new URLSearchParams(window.location.search);
+  let tg_id =
+    queryParameters.get("tgid") !== null ? queryParameters.get("tgid") : "";
 
   useEffect(() => {
-    expand();
-
-    async () => {
-      const onboardingInformation: {
-        apiKey: ApiKeyCredentials;
-        user: UserResponseObject;
-        account: AccountResponseObject;
-      } = await client.onboarding.createUser(
-        {
-          starkKey: "71234abcd",
-          starkKeyYCoordinate: "01234abcd",
-          country: "SG",
-        },
-        address
-      );
+    const init = () => {
+      axios
+        .get(API_URL + "/account/user/" + tg_id)
+        .then((response) => {
+          if (response.data.succeed == true) {
+            setLoading(false);
+            setUserData(response.data.data);
+          } else {
+            setTgid("");
+          }
+        })
+        .catch((error) => {
+          console.log("error", error);
+        });
     };
+
+    if (tg_id != null && tg_id != "") {
+      init();
+      setTgid(tg_id);
+      localStorage.setItem("tgid", tg_id);
+    } else {
+      localStorage.setItem("tgid", "");
+    }
   }, []);
+
+  if (tgid == "") {
+    return (
+      <div style={{ textAlign: "center", marginTop: "48vh" }}>
+        You Need To Create Account First
+      </div>
+    );
+  }
 
   return (
     <WebAppProvider options={{ smoothButtonsTransition }}>
       <Router>
-        <MainLayout>
-          <Routes>
-            <Route path="/" element={<Overview />} />
-            <Route path="/deposit" element={<Deposit />} />
-            <Route path="/withdraw" element={<Withdraw />} />
-            <Route path="/trade" element={<Trade />} />
-          </Routes>
-        </MainLayout>
+        {userData != undefined ? (
+          <MainLayout>
+            <Routes>
+              <Route path="/" element={<Overview userData={userData} />} />
+              <Route
+                path="/deposit"
+                element={<Deposit userData={userData} />}
+              />
+              <Route
+                path="/withdraw"
+                element={<Withdraw userData={userData} />}
+              />
+              <Route path="/trade" element={<Trade userData={userData} />} />
+            </Routes>
+          </MainLayout>
+        ) : loading == true ? (
+          <div style={{ textAlign: "center", paddingTop: "48vh" }}>
+            Loading...
+          </div>
+        ) : (
+          <div style={{ textAlign: "center", paddingTop: "48vh" }}>
+            You Need To Create Account First
+          </div>
+        )}
       </Router>
     </WebAppProvider>
   );

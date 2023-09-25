@@ -20,7 +20,7 @@ app.get("/", (req, res) => {
 accountRouter(app);
 dydxRouter(app);
 
-const PORT = process.env.PORT || 80;
+const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => {
   console.log(`Server is running on port ${PORT}.`);
 });
