@@ -8,8 +8,6 @@ export const accountRouter = (app) => {
   router.get("/user/:tg_id", account.user);
   router.post("/deposit/:tg_id", account.deposit);
   router.post("/withdraw/:tg_id", account.withdraw);
-  router.post("/trade/:tg_id", account.trade);
-  // router.get("/onboarding/:tg_id", account.onboarding);
 
   app.use("/api/account", router);
 };

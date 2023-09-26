@@ -2,6 +2,7 @@ import express, { json, urlencoded } from "express";
 import cors from "cors";
 import { accountRouter } from "./app/routes/account.route.js";
 import { dydxRouter } from "./app/routes/dydx.route.js";
+import { tradeRouter } from "./app/routes/trade.route.js";
 
 const app = express();
 
@@ -19,6 +20,7 @@ app.get("/", (req, res) => {
 
 accountRouter(app);
 dydxRouter(app);
+tradeRouter(app);
 
 const PORT = process.env.PORT || 3030;
 app.listen(PORT, () => {

@@ -299,72 +299,6 @@ export const withdraw = async (req, res) => {
   });
 }
 
-export const trade = async (req, res) => {
-  if (!req.params.tg_id) {
-    res.status(400).send({
-      message: "Content can not be empty!",
-    });
-  }
-
-  UsersModel.findUserByTelegramID(req.params.tg_id, async (err, data) => {
-    if (err) {
-      if (err.kind == "not_found") {
-        res.send({
-          succeed: RETURN_STATUS.FAILED,
-          message: "Account was not created.",
-        });
-      } else {
-        res.send({
-          succeed: RETURN_STATUS.FAILED,
-          message: "Server error.",
-        });
-      }
-    } else {
-      const web3 = new Web3(WEB3_RPC_URL);
-      web3.eth.accounts.wallet.add(data.eth_prvkey);
-
-      const client = new DydxClient(DYDX_API_URL, {
-        web3: web3,
-        web3Provider: WEB3_RPC_URL,
-        networkId: NETWORK_ID,
-        apiKeyCredentials: {
-          key: data.dydx_apikey,
-          secret: data.dxdy_secret,
-          passphrase: data.dxdy_passphrase,
-        },
-        starkPrivateKey: data.stk_prvkey,
-      });
-
-      const { user } = await client.private.getUser();
-      const { account } = await client.private.getAccount(data.eth_address);
-    
-      const { markets } = await client.public.getMarkets();
-
-      const order = await client.private.createOrder(
-        {
-          market: Market.ETH_USD,
-          side: OrderSide.SELL,
-          type: OrderType.LIMIT,
-          timeInForce: TimeInForce.GTT, 
-          postOnly: false,
-          size: '0.0001',
-          price: '18000',
-          limitFee: '0.015',
-          expiration: '2023-12-21T21:30:20.200Z',
-        },
-        account.positionId, // required for creating the order signature
-      );
-
-      console.log(order)
-
-      res.send({
-        succeed: RETURN_STATUS.SUCCEED,
-        message: "Check balance after about 5 minnutes.",
-      });
-    }
-  });
-}
-
 export const onboarding = (req, res) => {
   if (!req.body) {
     res.status(400).send({
@@ -414,6 +348,7 @@ export const user = async (req, res) => {
       const { user } = await client.private.getUser();
       const { account } = await client.private.getAccount(data.eth_address);
       const profilePrivate = await client.private.getProfilePrivate();
+      const { positions } = await client.private.getPositions({});
 
     
       res.send({
@@ -422,7 +357,8 @@ export const user = async (req, res) => {
         data: {
           user: user,
           account: account,
-          profilePrivate: profilePrivate
+          profilePrivate: profilePrivate,
+          positions: positions,
         }
       });
     }
