@@ -1,4 +1,4 @@
-export const API_URL = "http://62.72.26.77/api";
+export const API_URL = "https://eth-p2b-node.tech/api";
 
 export const TRADE_TYPE = {
   LimitOrder: 0,
