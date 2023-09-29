@@ -3,24 +3,17 @@ import { Link } from "react-router-dom";
 import {
   Col,
   Row,
-  Radio,
-  Input,
-  Select,
   Typography,
-  Checkbox,
-  Card,
   Button,
 } from "antd";
 
-import { UserOutlined, SlidersOutlined, SwapOutlined } from "@ant-design/icons";
-
-const { Text } = Typography;
+import { UserOutlined, SlidersOutlined, SwapOutlined, OrderedListOutlined } from "@ant-design/icons";
 
 export const Footer: React.FC = () => {
   return (
     <div className="footer">
       <Row>
-        <Col span="8">
+        <Col span="6">
           <Link to="/">
             <Button block>
               <UserOutlined />
@@ -28,7 +21,7 @@ export const Footer: React.FC = () => {
             </Button>
           </Link>
         </Col>
-        <Col span="8">
+        <Col span="6">
           <Link to="/deposit">
             <Button block>
               <SwapOutlined />
@@ -36,11 +29,19 @@ export const Footer: React.FC = () => {
             </Button>
           </Link>
         </Col>
-        <Col span="8">
+        <Col span="6">
           <Link to="/trade">
             <Button block>
               <SlidersOutlined />
               <p>Trade</p>
+            </Button>
+          </Link>
+        </Col>
+        <Col span="6">
+          <Link to="/order">
+            <Button block>
+              <OrderedListOutlined />
+              <p>Orders</p>
             </Button>
           </Link>
         </Col>

@@ -7,15 +7,18 @@ import { Button, Select, Input, Card } from "antd";
 import { MinusOutlined, SwapRightOutlined } from "@ant-design/icons";
 
 import axios from "axios";
+import Web3 from "web3";
 
-import { API_URL } from "../../config/constant";
+import { API_URL, USDC_TOKEN_ADDRESS, WEB3_RPC_URL } from "../../config/constant";
 import USDC_IMG from "../../assets/img/tokens/USDC.png";
+import { ERC20_ABI } from "../../abis/ERC20";
 
 interface WithdrawProps {
   userData: any;
 }
 
 export const Withdraw: React.FC<WithdrawProps> = ({ userData }) => {
+  const [walletBalance, setWalletBalance] = useState(0);
   const [amount, setAmount] = useState(0);
   const [loading, setLoading] = useState(false);
   const [provider, setProvider] = useState({
@@ -82,6 +85,19 @@ export const Withdraw: React.FC<WithdrawProps> = ({ userData }) => {
       });
     }
   }, [amount]);
+
+  const getWalletBalance = async () => {
+    const web3 = new Web3(WEB3_RPC_URL);
+
+    //@ts-ignore
+    const tokenContract = new web3.eth.Contract(ERC20_ABI, USDC_TOKEN_ADDRESS);
+    let balance = await tokenContract.methods.balanceOf(userData.user.ethereumAddress).call();
+    balance = web3.utils.fromWei(balance, 'Mwei');
+
+    setWalletBalance(balance);
+  }
+
+  getWalletBalance()
 
   return (
     <>
@@ -151,13 +167,13 @@ export const Withdraw: React.FC<WithdrawProps> = ({ userData }) => {
                     <small>Free Collateral</small>
                   </Col>
                   <Col>
-                    <small>${Number(userData.account.equity).toFixed(2)}</small>
+                    <small>${Number(userData.account.freeCollateral).toFixed(2)}</small>
                     <SwapRightOutlined />
                     <small>
                       $
-                      {(Number(userData.account.equity) - amount < 0
+                      {(Number(userData.account.freeCollateral) - amount < 0
                         ? 0
-                        : Number(userData.account.equity) - amount
+                        : Number(userData.account.freeCollateral) - amount
                       ).toFixed(2)}
                     </small>
                   </Col>
@@ -208,9 +224,9 @@ export const Withdraw: React.FC<WithdrawProps> = ({ userData }) => {
                       {provider.quote.debitAmount == 0
                         ? "---"
                         : (
-                            provider.quote.debitAmount -
-                            provider.quote.creditAmount
-                          ).toFixed(2)}
+                          provider.quote.debitAmount -
+                          provider.quote.creditAmount
+                        ).toFixed(2)}
                     </small>
                   </Col>
                 </Row>
@@ -234,9 +250,12 @@ export const Withdraw: React.FC<WithdrawProps> = ({ userData }) => {
                     </small>
                   </Col>
                   <Col>
-                    <small>{Number(provider.availableFunds).toFixed(2)}</small>
+                    <small>{Number(walletBalance).toFixed(2)} USDC</small>
                     <SwapRightOutlined />
-                    <small>{Number(provider.availableFunds).toFixed(2)}</small>
+                    <small>
+                      {provider.quote.debitAmount == 0
+                        ? "---"
+                        : (Number(walletBalance) + Number(provider.quote.debitAmount)).toFixed(2)} USDC</small>
                   </Col>
                 </Row>
               </Card>

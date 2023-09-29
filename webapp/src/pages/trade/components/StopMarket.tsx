@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect } from "react";
+import { OrderSide, TimeInForce } from "../../../config/constant";
 import {
   Col,
   Row,
@@ -9,18 +10,55 @@ import {
   Checkbox,
   Card,
   Button,
+  RadioChangeEvent,
 } from "antd";
 
 const { Text } = Typography;
 
-export const StopMarket: React.FC = () => {
+interface OrderProps {
+  placeOrder: any;
+  marketDetail: any | undefined;
+  orderDetail: any;
+  setOrderDetail: any;
+}
+
+export const StopMarket: React.FC<OrderProps> = ({ placeOrder, marketDetail, orderDetail, setOrderDetail }) => {
+
+  const onChangeSide = (e: RadioChangeEvent) => {
+    setOrderDetail({ ...orderDetail, side: e.target.value })
+  };
+
+  const onChangeAmount = (e: any) => {
+    setOrderDetail({ ...orderDetail, size: e.target.value })
+  }
+
+  const onChangeTriggerPrice = (e: any) => {
+    setOrderDetail({ ...orderDetail, triggerPrice: e.target.value })
+  }
+
+  const onChangePrice = (e: any) => {
+    setOrderDetail({ ...orderDetail, price: e.target.value })
+  }
+
+  const onChangeTIF = (e: any) => {
+    setOrderDetail({ ...orderDetail, timeInForce: e })
+  }
+
+  const onChangeReduceOnly = (e: any) => {
+    setOrderDetail({ ...orderDetail, reduceOnly: e.target.checked })
+  }
+
+  useEffect(() => {
+    setOrderDetail({ ...orderDetail, type: "MARKET" })
+  }, [])
+
   return (
     <>
       <Row style={{ justifyContent: "center" }}>
         <Col>
-          <Radio.Group value="buy">
-            <Radio.Button value="buy">Buy</Radio.Button>
-            <Radio.Button value="sell">Sell</Radio.Button>
+          <Radio.Group value={orderDetail.side} onChange={onChangeSide} buttonStyle="solid">
+            <Radio.Button value={OrderSide.BUY} >{OrderSide.BUY}</Radio.Button>
+            <Radio.Button value={OrderSide.SELL} >{OrderSide.SELL}</Radio.Button>
           </Radio.Group>
         </Col>
       </Row>
@@ -31,10 +69,10 @@ export const StopMarket: React.FC = () => {
           </Text>
         </Col>
         <Col span="12" style={{ paddingRight: "2px" }}>
-          <Input size="large" placeholder="0" suffix="ETH" />
+          <Input type="number" size="large" placeholder="0" suffix={marketDetail.baseAsset} value={orderDetail.size} onChange={onChangeAmount} />
         </Col>
         <Col span="12" style={{ paddingLeft: "2px" }}>
-          <Input size="large" placeholder="0" suffix="USD" />
+          <Input size="large" placeholder="0" suffix="USD" value={Number(orderDetail.size * marketDetail.indexPrice).toFixed(2)} />
         </Col>
       </Row>
       <Row>
@@ -44,10 +82,10 @@ export const StopMarket: React.FC = () => {
           </Text>
         </Col>
         <Col span="24">
-          <Input size="large" placeholder="0" />
+          <Input type="number" size="large" placeholder="0" value={orderDetail.triggerPrice} onChange={onChangeTriggerPrice} />
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col span="24">
           <Text>Good Til Time</Text>
         </Col>
@@ -71,7 +109,7 @@ export const StopMarket: React.FC = () => {
             </Col>
           </Row>
         </Col>
-      </Row>
+      </Row> */}
       <Row>
         <Col span="24">
           <Text>Execution</Text>
@@ -80,29 +118,29 @@ export const StopMarket: React.FC = () => {
           <Select
             size="large"
             style={{ width: "100%" }}
-            defaultValue="Fill Or Kill"
+            value={orderDetail.timeInForce}
+            onChange={onChangeTIF}
             options={[
-              { value: "Default", label: "Default" },
-              { value: "Fill Or Kill", label: "Fill Or Kill" },
-              { value: "Immediate Or Cancel", label: "Immediate Or Cancel" },
-              { value: "Post-Only", label: "Post-Only" },
+              { value: TimeInForce.GTT, label: "Good Til Time" },
+              { value: TimeInForce.FOK, label: "Fill Or Kill" },
+              { value: TimeInForce.IOC, label: "Immediate Or Cancel" },
             ]}
           />
         </Col>
         <Col span="24">
-          <Checkbox checked={false}>Reduce-Only</Checkbox>
+          <Checkbox checked={orderDetail.reduceOnly} onChange={onChangeReduceOnly}>Reduce-Only</Checkbox>
         </Col>
       </Row>
       <Row>
         <Col span="24">
           <Card
             actions={[
-              <Button type="primary" block>
+              <Button type="primary" block onClick={() => placeOrder(orderDetail)} >
                 Place Stop Market
               </Button>,
             ]}
           >
-            <Row style={{ justifyContent: "space-between" }}>
+            {/* <Row style={{ justifyContent: "space-between" }}>
               <Col>
                 <small>
                   Fee <code>Taker</code>
@@ -119,7 +157,7 @@ export const StopMarket: React.FC = () => {
               <Col>
                 <small>$1,992.00</small>
               </Col>
-            </Row>
+            </Row> */}
           </Card>
         </Col>
       </Row>

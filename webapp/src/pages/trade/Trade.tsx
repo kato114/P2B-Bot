@@ -6,7 +6,7 @@ import { CaretDownOutlined, CaretUpOutlined } from "@ant-design/icons";
 
 import axios from "axios";
 
-import { API_URL, TRADE_TYPE } from "../../config/constant";
+import { API_URL, OrderSide, OrderType, TRADE_TYPE, TimeInForce } from "../../config/constant";
 
 import { LimitOrder } from "./components/LimitOrder";
 import { MarketOrder } from "./components/MarketOrder";
@@ -16,17 +16,15 @@ import { TakeProfitLimit } from "./components/TakeProfitLimit";
 import { TakeProfitMarket } from "./components/TakeProfitMarket";
 import { TrailingStop } from "./components/TrailingStop";
 
-import ETH_LOGO from "../../assets/img/tokens/ETH.png";
 import { MarketList } from "./components/MarketList";
 
-const { Text, Link } = Typography;
+const { Text } = Typography;
 
 interface TradeProps {
   userData: any;
 }
 
 export const Trade: React.FC<TradeProps> = ({ userData }) => {
-  console.log(localStorage.getItem("tgid"));
   const [orderType, setOrderType] = useState(TRADE_TYPE.LimitOrder);
 
   const [marketList, setMarketList] = useState([]);
@@ -34,6 +32,59 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
   const [showMarketList, setShowMarketList] = useState(false);
 
   const [loading, setLoading] = useState(true);
+
+  const [orderDetail, setOrderDetail] = useState({
+    market: "ETH-USD",
+    side: OrderSide.BUY,
+    type: OrderType.LIMIT,
+    timeInForce: TimeInForce.IOC,
+    postOnly: false,
+    reduceOnly: false,
+    size: 0,
+    price: 0,
+    limitFee: 0.0015,
+    expiration: '2023-12-21T21:30:20.200Z'
+  });
+
+  useEffect(() => {
+    setOrderDetail({ ...orderDetail, market: currentMarket })
+  }, [currentMarket])
+
+  useEffect(() => {
+    switch (orderType) {
+      case 0:
+        setOrderDetail({ ...orderDetail, type: OrderType.LIMIT })
+        break;
+      case 1:
+        setOrderDetail({ ...orderDetail, type: OrderType.MARKET })
+        console.log(OrderType.MARKET)
+        break;
+      case 2:
+        setOrderDetail({ ...orderDetail, type: OrderType.STOP_LIMIT })
+        break;
+      case 3:
+        setOrderDetail({ ...orderDetail, type: OrderType.MARKET })
+        break;
+      case 4:
+        setOrderDetail({ ...orderDetail, type: OrderType.TAKE_PROFIT })
+        break;
+      case 5:
+        setOrderDetail({ ...orderDetail, type: OrderType.TAKE_PROFIT })
+        break;
+      case 6:
+        setOrderDetail({ ...orderDetail, type: OrderType.TRAILING_STOP })
+        break;
+      default:
+        setOrderDetail({ ...orderDetail, type: OrderType.LIMIT })
+        break;
+    }
+    setOrderDetail({ ...orderDetail, type: OrderType.LIMIT })
+  }, [orderType])
+
+
+  useEffect(() => {
+    console.log(orderDetail)
+  }, [orderDetail])
 
   useEffect(() => {
     axios
@@ -45,10 +96,30 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
           setLoading(false);
         }
       })
-      .catch((error) => {});
+      .catch((error) => { });
   }, []);
 
-  const getCurrentMarket = (marketKey: string, dataKey: string) => {
+  useEffect(() => {
+    axios
+      .get(API_URL + "/trade/order/" + localStorage.getItem("tgid"))
+      .then((response) => {
+        if (response.data.succeed) {
+          setLoading(false);
+        }
+      })
+      .catch((error) => { });
+  }, [orderDetail.market, orderDetail.side, orderDetail.type]);
+
+  const getCurrentMarket = (marketKey: string) => {
+    for (let key in marketList) {
+      if (key == marketKey) {
+        return marketList[key];
+      }
+    }
+    return undefined;
+  };
+
+  const getCurrentMarketItem = (marketKey: string, dataKey: string) => {
     for (let key in marketList) {
       if (key == marketKey) {
         return marketList[key][dataKey];
@@ -57,13 +128,22 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
     return "";
   };
 
+  const placeOrder = () => {
+    axios
+      .post(API_URL + "/trade/order/" + localStorage.getItem("tgid"), orderDetail)
+      .then((response) => {
+        if (response.data.succeed) toast.success(response.data.message);
+        else toast.error(response.data.message);
+        setLoading(false);
+      })
+      .catch((error) => {
+        toast.error("Server error.");
+        setLoading(false);
+      });
+  }
+
   return (
     <>
-      {console.log(
-        `../../../assets/img/tokens/${currentMarket
-          .split("-")[0]
-          .toLowerCase()}.svg`
-      )}
       {loading === false && Object.keys(marketList).length > 0 ? (
         <>
           <Row>
@@ -97,7 +177,7 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
                       />
                     </Col>
                     <Col>
-                      <p>{getCurrentMarket(currentMarket, "baseAsset")}</p>
+                      <p>{getCurrentMarketItem(currentMarket, "baseAsset")}</p>
                       <small>{currentMarket}</small>
                     </Col>
                   </Row>
@@ -111,35 +191,35 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
               <p
                 style={{
                   color:
-                    Number(getCurrentMarket(currentMarket, "priceChange24H")) >
-                    0
+                    Number(getCurrentMarketItem(currentMarket, "priceChange24H")) >
+                      0
                       ? "#5298fd"
                       : "#fd5252",
                 }}
               >
                 $
-                {Number(getCurrentMarket(currentMarket, "indexPrice")).toFixed(
+                {Number(getCurrentMarketItem(currentMarket, "indexPrice")).toFixed(
                   2
                 )}
               </p>
               <small
                 style={{
                   color:
-                    Number(getCurrentMarket(currentMarket, "priceChange24H")) >
-                    0
+                    Number(getCurrentMarketItem(currentMarket, "priceChange24H")) >
+                      0
                       ? "#5298fd"
                       : "#fd5252",
                 }}
               >
-                {Number(getCurrentMarket(currentMarket, "priceChange24H")) >
-                0 ? (
+                {Number(getCurrentMarketItem(currentMarket, "priceChange24H")) >
+                  0 ? (
                   <CaretUpOutlined />
                 ) : (
                   <CaretDownOutlined />
                 )}
                 {(
-                  (Number(getCurrentMarket(currentMarket, "priceChange24H")) /
-                    Number(getCurrentMarket(currentMarket, "indexPrice"))) *
+                  (Number(getCurrentMarketItem(currentMarket, "priceChange24H")) /
+                    Number(getCurrentMarketItem(currentMarket, "indexPrice"))) *
                   100
                 ).toFixed(2)}
                 %
@@ -175,13 +255,13 @@ export const Trade: React.FC<TradeProps> = ({ userData }) => {
               />
             </Col>
           </Row>
-          {orderType == TRADE_TYPE.LimitOrder && <LimitOrder />}
-          {orderType == TRADE_TYPE.MarketOrder && <MarketOrder />}
-          {orderType == TRADE_TYPE.StopLimit && <StopLimit />}
-          {orderType == TRADE_TYPE.StopMarket && <StopMarket />}
-          {orderType == TRADE_TYPE.TakeProfitLimit && <TakeProfitLimit />}
-          {orderType == TRADE_TYPE.TakeProfitMarket && <TakeProfitMarket />}
-          {orderType == TRADE_TYPE.TrailingStop && <TrailingStop />}
+          {orderType == TRADE_TYPE.LimitOrder && <LimitOrder placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.MarketOrder && <MarketOrder placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.StopLimit && <StopLimit placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.StopMarket && <StopMarket placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.TakeProfitLimit && <TakeProfitLimit placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.TakeProfitMarket && <TakeProfitMarket placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
+          {orderType == TRADE_TYPE.TrailingStop && <TrailingStop placeOrder={placeOrder} marketDetail={getCurrentMarket(currentMarket)} orderDetail={orderDetail} setOrderDetail={setOrderDetail} />}
           {showMarketList && (
             <MarketList
               marketList={marketList}

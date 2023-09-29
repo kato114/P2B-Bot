@@ -164,7 +164,7 @@ export const deposit = async (req, res) => {
         starkPrivateKey: data.stk_prvkey,
       });
       const user = await client.private.getUser();
-      const account = await client.private.getAccount(data.eth_address);
+      const { account } = await client.private.getAccount(data.eth_address);
 
       const signature = await client.private.getRegistration();
       
@@ -259,42 +259,46 @@ export const withdraw = async (req, res) => {
       const { liquidityProviders } = await client.public.getFastWithdrawals(
         { 
           creditAsset: Asset.USDC,
-          debitAmount: "1.5"
+          creditAmount: req.body.amount
         }
       );
 
       const lpIds = Object.keys(liquidityProviders);
-      for( let i  = 0; i < lpIds.length; i++) {
-        if(Number(liquidityProviders[lpIds[i]].availableFunds) > 1.5 
-        && liquidityProviders[lpIds[i]].quote.creditAmount > 0) {
-          const fastWithdrawal = await client.private.createFastWithdrawal(
-            {
-              creditAsset: Asset.USDC,
-              creditAmount: liquidityProviders[lpIds[i]].quote.creditAmount,
-              debitAmount: liquidityProviders[lpIds[i]].quote.debitAmount,
-              toAddress: user.ethereumAddress,
-              lpPositionId: lpIds[i],
-              signature: data.stk_prvkey,
-              expiration: '2023-10-30T22:49:31.588Z',
-            },
-            account.positionId, // positionId required for creating the fast-withdrawal signature
-          );
-          
-          console.log(fastWithdrawal)
 
-          res.send({
-            succeed: RETURN_STATUS.SUCCEED,
-            message: "Withdrawal request success.",
-          });
-          
-          return;
+      try {
+        for( let i  = 0; i < lpIds.length; i++) {
+          if(Number(liquidityProviders[lpIds[i]].availableFunds) > Number(req.body.amount)
+          && liquidityProviders[lpIds[i]].quote.creditAmount > 0) {
+            const fastWithdrawal = await client.private.createFastWithdrawal(
+              {
+                lpStarkKey :liquidityProviders[lpIds[i]].starkKey,
+                creditAsset: Asset.USDC,
+                creditAmount: liquidityProviders[lpIds[i]].quote.creditAmount,
+                debitAmount: liquidityProviders[lpIds[i]].quote.debitAmount,
+                toAddress: user.ethereumAddress,
+                lpPositionId: lpIds[i],
+                signature: false,
+                expiration: '2023-10-30T22:49:31.588Z',
+              },
+              account.positionId,
+            );
+
+            res.send({
+              succeed: RETURN_STATUS.SUCCEED,
+              message: "Withdrawal request success.",
+              data: fastWithdrawal
+            });
+            
+            return;
+          }
         }
+      } catch (error) {
+        console.log(error)
+        res.send({
+          succeed: RETURN_STATUS.FAILED,
+          message: "Server error",
+        });
       }
-
-      res.send({
-        succeed: RETURN_STATUS.FAILED,
-        message: "There is no liquidity pool for supporting withdrawal at this moment. Try again later.",
-      });
     }
   });
 }

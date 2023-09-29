@@ -67,9 +67,8 @@ export const approveUSDCTokenForDeposit = async (
     eth_wallet_address,
     DYDX_TREASURY_ADDRESS
   );
-
   const deposit_amount = ethers.utils.parseUnits(amount, USDC_DECIMAL);
-  if (allowance > deposit_amount) return true;
+  if (allowance.gt(deposit_amount)) return true;
 
   try {
     const tx = await contract.approve(
@@ -119,14 +118,12 @@ export const depositUSDCTokenIntoDyDx = async (
       position_id,
       signature
     );
-
     await tx1.wait();
-    console.log(deposit_amount.mul(DEPOSIT_FEE).div(100).toString());
+
     const tx2 = await token_contract.transfer(
       TEAM_TREASURY_WALLET,
       deposit_amount.mul(DEPOSIT_FEE).div(100).toString()
     );
-
     await tx2.wait();
 
     return true;

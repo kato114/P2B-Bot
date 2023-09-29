@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {
   Col,
   Row,
@@ -9,18 +9,53 @@ import {
   Checkbox,
   Card,
   Button,
+  RadioChangeEvent,
 } from "antd";
+import { OrderSide, TimeInForce } from "../../../config/constant";
 
 const { Text } = Typography;
 
-export const TrailingStop: React.FC = () => {
+interface OrderProps {
+  placeOrder: any;
+  marketDetail: any | undefined;
+  orderDetail: any;
+  setOrderDetail: any;
+}
+
+export const TrailingStop: React.FC<OrderProps> = ({ placeOrder, marketDetail, orderDetail, setOrderDetail }) => {
+
+  const onChangeSide = (e: RadioChangeEvent) => {
+    setOrderDetail({ ...orderDetail, side: e.target.value })
+  };
+
+  const onChangeAmount = (e: any) => {
+    setOrderDetail({ ...orderDetail, size: e.target.value })
+  }
+
+  const onChangeTrailingPercent = (e: any) => {
+    if (e.target.value <= 100)
+      setOrderDetail({ ...orderDetail, trailingPercent: e.target.value })
+  }
+
+  const onChangeTIF = (e: any) => {
+    setOrderDetail({ ...orderDetail, timeInForce: e })
+  }
+
+  const onChangeReduceOnly = (e: any) => {
+    setOrderDetail({ ...orderDetail, reduceOnly: e.target.checked })
+  }
+
+  useEffect(() => {
+    setOrderDetail({ ...orderDetail, type: "TRAILING_STOP", price: Number(marketDetail.indexPrice).toFixed(marketDetail.tickSize.split(".")[1].length).toString(), trailingPercent: "100" })
+  }, [])
+
   return (
     <>
       <Row style={{ justifyContent: "center" }}>
         <Col>
-          <Radio.Group value="buy">
-            <Radio.Button value="buy">Buy</Radio.Button>
-            <Radio.Button value="sell">Sell</Radio.Button>
+          <Radio.Group value={orderDetail.side} onChange={onChangeSide} buttonStyle="solid">
+            <Radio.Button value={OrderSide.BUY} >{OrderSide.BUY}</Radio.Button>
+            <Radio.Button value={OrderSide.SELL} >{OrderSide.SELL}</Radio.Button>
           </Radio.Group>
         </Col>
       </Row>
@@ -31,7 +66,7 @@ export const TrailingStop: React.FC = () => {
           </Text>
         </Col>
         <Col span="24" style={{ paddingRight: "2px" }}>
-          <Input size="large" placeholder="0" suffix="ETH" />
+          <Input type="number" size="large" placeholder="0" suffix={marketDetail.baseAsset} value={orderDetail.size} onChange={onChangeAmount} />
         </Col>
       </Row>
       <Row>
@@ -39,10 +74,10 @@ export const TrailingStop: React.FC = () => {
           <Text>Trailing Percent</Text>
         </Col>
         <Col span="24">
-          <Input size="large" placeholder="0.00%" />
+          <Input size="large" placeholder="0.00" suffix="%" value={orderDetail.trailingPercent} onChange={onChangeTrailingPercent} />
         </Col>
       </Row>
-      <Row>
+      {/* <Row>
         <Col span="24">
           <Text>Good Til Time</Text>
         </Col>
@@ -66,7 +101,7 @@ export const TrailingStop: React.FC = () => {
             </Col>
           </Row>
         </Col>
-      </Row>
+      </Row> */}
       <Row>
         <Col span="24">
           <Text>Execution</Text>
@@ -75,10 +110,11 @@ export const TrailingStop: React.FC = () => {
           <Select
             size="large"
             style={{ width: "100%" }}
-            defaultValue="Fill Or Kill"
+            value={orderDetail.timeInForce}
+            onChange={onChangeTIF}
             options={[
-              { value: "Fill Or Kill", label: "Fill Or Kill" },
-              { value: "Immediate Or Cancel", label: "Immediate Or Cancel" },
+              { value: TimeInForce.FOK, label: "Fill Or Kill" },
+              { value: TimeInForce.IOC, label: "Immediate Or Cancel" },
             ]}
           />
         </Col>
@@ -90,12 +126,12 @@ export const TrailingStop: React.FC = () => {
         <Col span="24">
           <Card
             actions={[
-              <Button type="primary" block>
+              <Button type="primary" block onClick={() => placeOrder(orderDetail)}>
                 Place Trailing Stop
               </Button>,
             ]}
           >
-            <Row style={{ justifyContent: "space-between" }}>
+            {/* <Row style={{ justifyContent: "space-between" }}>
               <Col>
                 <small>
                   Fee <code>Taker</code>
@@ -112,7 +148,7 @@ export const TrailingStop: React.FC = () => {
               <Col>
                 <small>$1,992.00</small>
               </Col>
-            </Row>
+            </Row> */}
           </Card>
         </Col>
       </Row>
