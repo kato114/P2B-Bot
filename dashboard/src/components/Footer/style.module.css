@@ -1,0 +1,11 @@
+.Footer {
+  @apply bottom-0 left-0 text-[13px] w-full;
+}
+
+.FooterItem {
+  @apply flex items-center justify-between py-1;
+}
+
+.FooterContact {
+  @apply flex items-center justify-center gap-2 mt-10;
+}

@@ -1,0 +1,31 @@
+.MainContent {
+  @apply flex flex-col w-full p-10 items-center;
+}
+
+.Instructions {
+  @apply flex flex-col items-center;
+}
+
+.Title {
+  @apply text-[15px] font-bold text-center py-2;
+}
+
+.Details {
+  @apply text-[12px] font-bold text-center;
+}
+
+.Divider {
+  @apply w-full h-[2px] bg-gradient-to-r from-[#00000000] via-white to-[#00000000] mt-20 mb-4;
+}
+
+.TableHeaderRow th {
+  @apply font-normal text-[14px] h-[40px];
+}
+
+.TableBodyRow {
+  @apply border-b-2 border-dashed;
+}
+
+.TableBodyRow td {
+  @apply text-[14px] py-2;
+}

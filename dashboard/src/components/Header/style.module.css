@@ -1,0 +1,15 @@
+.Header {
+  @apply w-full flex flex-col px-8 py-2 text-[14px] items-end gap-2;
+}
+
+.CheckRewards {
+  @apply border-2 border-dashed rounded-lg p-1 flex items-center justify-between gap-1;
+}
+
+.ButtonCheck {
+  @apply bg-[#21282c] hover:bg-[#31383c] rounded-lg h-full px-6 py-2 flex items-center gap-2;
+}
+
+.InputAddress {
+  @apply bg-transparent placeholder:text-[#555a60] px-1 outline-none w-[150px];
+}

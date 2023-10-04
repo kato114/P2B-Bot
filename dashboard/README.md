@@ -1,176 +1,67 @@
-<h1><a href="https://ui-lib.com/downloads/matx-react-dashboard/">Matx React Material Design Admin Dashboard Template</a></h1>
+# Vite React Typescript Tailwind Template
 
-<a href="https://matx-react-free.netlify.app/"><img alt="Matx React Admin" src="https://ui-lib.com/blog/wp-content/uploads/2021/09/matx-github.png" /></a>
+<p align="center">
+    <img src="./public/vite-logo.png" width="240" height="240" alt="vite">
+    <br>
+    <br>
+</p>
 
-<p>MatX is a full-featured React Material UI Admin Dashboard template. MatX is built with React, Redux & Material UI We implemented all the features you might need to start a new Web application. The free version includes all Material UI components, Form elements, and validation, JWT authentication, Sign in, sign up pages,  Vertical navigation, Lazy loading, Code splitting.</p>
+This template has been configured with all of the tools required to create a React Application using **TypeScript** and **TailwindCSS** with Vite.
 
-<h2>Features</h2>
-<table>
-<tr>
-<th>MatX Free</th>
-<th>MatX Pro</th>
-</tr>
-<tr>
-<td>
-<a href="https://matx-react-free.netlify.app/">Live Preview</a> <br>
-<a href="https://ui-lib.com/downloads/matx-react-dashboard/">Download MatX</a>
-</td>
-<td>
-<a href="http://matx-react.ui-lib.com/">Live Preview</a> <br>
-<a href="https://ui-lib.com/downloads/matx-pro-react-admin/">Get MatX Pro</a>
-</td>
-</tr>
-<tr>
-<td valign="top">
-<ul>
-  <li>JWT authentication</li>
-  <li>Role based authentication</li>
-  <li>Lazy loading components</li>
-  <li>Code splitting</li>
-  <li>Dashboard Analytics</li>
-  <li>UI kits
-    <ul>
-      <li>Autocomplete</li>
-      <li>Buttons</li>
-      <li>Checkbox</li>
-      <li>Dialog</li>
-      <li>Expansion panel</li>
-      <li>Menu</li>
-      <li>Progress</li>
-      <li>Datetime picker</li>
-      <li>Radio</li>
-      <li>Switch</li>
-      <li>Slider</li>
-      <li>Snackbar</li>
-      <li>Data table</li>
-    </ul>
-  </li>
-  <li>Forms
-    <ul>
-      <li>Basic</li>
-      <li>Rich text editor</li>
-    </ul>
-  </li>
-  <li>eChart</li>
-  <li>Session pages
-    <ul>
-      <li>Sign in</li>
-      <li>Sign up</li>
-      <li>Forgot password</li>
-      <li>Error page</li>
-    </ul>
-  </li>
-  <li>Drag and drop</li>
-  <li>Google map</li>
-  <li>Utilities
-    <ul>
-      <li>Color</li>
-      <li>Spacing</li>
-      <li>Typography</li>
-      <li>Display</li>
-    </ul>
-  </li>
-  <li>Multi level menu</li>
-</ul>
-</td>
-<td valign="top">
-<ul>
-  <li>All features of Matx free +</li>
-  <li>Firebase authentication</li>
-  <li>Auth0 authentication</li>
-  <li>Horizontal navigation</li>
-  <li>Pages
-    <ul>
-        <li>Customer List</li>
-        <li>Customer View/Add/Edit</li>
-        <li>Product List</li>
-        <li>Customer View/Add/Edit</li>
-        <li>Order List</li>
-        <li>Order View/Add/Edit</li>
-        <li>Help center</li>
-        <li>FAQ</li>
-        <li>Pricings</li>
-        <li>User List/Grid/Row</li>
-    </ul>
+## Technologies
 
-  </li>
-  <li>Forms
-    <ul>
-      <li>Order form</li>
-      <li>Invoice form</li>
-      <li>Property listing form</li>
-      <li>Single upload</li>
-      <li>Multiple upload</li>
-      <li>Wizard</li>
-    </ul>
-  </li>
-  <li>Working Apps
-    <ul>
-      <li>CRUD table</li>
-      <li>Shop/eCommerce</li>
-      <li>Scrum board</li>
-      <li>Invoice builder</li>
-      <li>Event calendar</li>
-      <li>Chat</li>
-      <li>Inbox</li>
-      <li>Todo</li>
-    </ul>
-  </li>
-  <li>Lists
-    <ul>
-      <li>Row/Grid List</li>
-      <li>Infinite scroll list</li>
-    </ul>
-  </li>
-  <li>Charts
-    <ul>
-      <li>eChart</li>
-      <li>Rechart</li>
-      <li>Victory chart</li>
-      <li>React vis</li>
-    </ul>
-  </li>
-  <li>Account setting</li>
-  <li>User profile</li>
-  <li>6 month support</li>
+![React](https://img.shields.io/badge/frontend-react-61DBFB?style=flat&logo=react)
+![TypeScript](https://img.shields.io/badge/frontend-ts-blue?style=flat&logo=typescript)
+![Tailwind](https://img.shields.io/badge/frontend-tailwind-00C4C4?style=flat&logo=tailwindcss)
+![ESLint](https://img.shields.io/badge/linter-eslint-4B32C3?style=flat&logo=eslint)
+![Prettier](https://img.shields.io/badge/formatter-prettier-F8BC45?style=flat&logo=prettier)
+![Vitest](https://img.shields.io/badge/specs-vitest-yellow?style=flat&logo=vitest)
+![Vite](https://img.shields.io/badge/build-vite-A855F7?style=flat&logo=vite)
 
-</ul>
-</td>
-</tr>
-</table>
+- [React](https://reactjs.org/)
+- [TypeScript](https://www.typescriptlang.org/)
+- [TailwindCSS](https://tailwindcss.com/) for utility CSS classes
+- [ESLint](https://eslint.org/) configured with some initial rules
+- [Prettier](https://prettier.io/) to enforce consistent code style
+- [Vitest](https://vitest.dev/) for unit testing and code coverage
+- [Vite](https://vitejs.dev/) to build the project for development or production
+- [Husky 🐶](https://typicode.github.io/husky/) runs the full list of specs before committing your changes to ensure that you have a green build
 
-<h2>Version 3 changes</h2>
+## Development
 
-- Added Material UI – Styled api (v5)
-- Added Material UI updated components from MUI@version 5
-- Added React Apex Chart
-- Updated JWT authentication
-- Updated Charts
-- Removed CSS Utilities (replaced by MUI)
-- Removed SASS Integrigration (replaced by Styled API)
-- Removed Victory chart (Replaced by React Apex Chart)
+### Setup
 
-<h2 id="availablescripts">Getting started</h2>
+1. `git clone https://github.com/nrabhiram/vite-react-ts-tailwind-template.git`
+2. Run `npm install` to install all of the project's dependencies
+3. Build the project for production: `npm run build`
+4. Run the local development server: `npm run dev`
 
-<p>In the project directory, you can run:</p>
+### Tailwind + CSS Modules
 
-<h3 id="npmstart"><code>npm start</code></h3>
+1. Create a CSS Module file by following the naming convention - `<Component>.module.css`
+2. Use the `@apply` directive in your CSS class definitions to use Tailwind's utility classes into your own custom CSS
+    
+    ```css
+    .app-heading {
+        @apply text-5xl font-semibold mb-4;
+    }
+    ```
+3. Import the CSS Module file into the React component file
 
-<p>Runs the app in the development mode.<br>
-Open <a href="http://localhost:3000">http://localhost:3000</a> to view it in the browser.</p>
+### Dev Loop
 
-<p>The page will reload if you make edits.<br>
-You will also see any lint errors in the console.</p>
+- `prettier-format` - run the autoformatter
+- `lint` - run the linter
+- `test` - run the specs
+- `test-filter <spec-name>` - run a specific spec
+- `coverage` - get a coverage report of the specs
+- `build` - build the project files for distribution
+- `dev` - run the local development server
 
-<h3 id="npmrunbuild"><code>npm run build</code></h3>
+## Contributing
 
-<p>Builds the app for production to the <code>build</code> folder.<br>
-It correctly bundles React in production mode and optimizes the build for the best performance.</p>
+Feel free to [open an issue](https://github.com/nrabhiram/vite-react-ts-tailwind-template/issues/new) or create a PR if you'd like to contribute 🙌
 
-<p>The build is minified and the filenames include the hashes.<br>
-Your app is ready to be deployed!</p>
+## License
 
-<h3>Download</h3>
-Download From <a href="https://ui-lib.com/downloads/matx-react-dashboard/">official website</a>
-
-<h3>For questions and support mail us at <a href="mailto:support@ui-lib.com">support@ui-lib.com</a></h3>
+The project is available as open source under the terms of the [MIT License](LICENSE).

@@ -1,0 +1,27 @@
+.LeftNavBar {
+  @apply hidden md:flex fixed w-[260px] top-0 left-0 h-full overflow-auto text-[15px] font-bold;
+}
+
+.Content {
+  @apply w-full p-5 flex flex-col;
+}
+
+.TopLogo {
+  @apply w-full flex flex-col gap-2 items-center;
+}
+
+.Divider {
+  @apply w-[2px] h-full bg-gradient-to-b from-[#00000000] via-white to-[#00000000];
+}
+
+.MainMenu {
+  @apply mt-10 flex-grow
+}
+
+.MenuItem {
+  @apply flex gap-5 h-[40px] items-center cursor-pointer;
+}
+
+.MenuItem-active {
+  @apply flex gap-5 h-[40px] items-center cursor-pointer text-[#6e95b4];
+}

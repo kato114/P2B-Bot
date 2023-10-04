@@ -1,0 +1,52 @@
+.MainContent {
+  @apply flex flex-col w-full p-10 items-center;
+}
+
+.Instructions {
+  @apply flex flex-col items-center;
+}
+
+.Title {
+  @apply text-[15px] font-bold text-center py-2;
+}
+
+.Details {
+  @apply text-[12px] font-bold text-center;
+}
+
+.Forfeiture {
+  @apply flex flex-col items-center border-2 border-dashed rounded-lg w-fit px-10 py-2 mt-10;
+}
+
+.Divider {
+  @apply w-full h-[2px] bg-gradient-to-r from-[#00000000] via-white to-[#00000000] mt-20 mb-4;
+}
+
+.TableHeaderRow th {
+  @apply font-normal text-[14px] h-[40px];
+}
+
+.TableBodyRow {
+  @apply border-b-2 border-dashed;
+}
+
+.TableBodyRow td {
+  @apply text-[14px] py-2;
+}
+
+.Button {
+  @apply border border-dashed rounded-lg px-3 py-0.5 text-[14px] bg-[#21282c] hover:bg-[#31383c] flex gap-2 items-center;
+}
+
+.ClaimedTable {
+  @apply w-full;
+}
+
+.ClaimedTable th,
+.ClaimedTable td {
+  @apply text-[12px] font-light;
+}
+
+.ClaimedTable tbody {
+  @apply max-h-[100px] overflow-y-auto;
+}
