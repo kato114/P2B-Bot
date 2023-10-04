@@ -1,6 +1,6 @@
 import axios from "axios";
 import Web3 from "web3";
-import { BN } from "web3-utils";
+import { BigNumber } from "ethers";
 
 import {
   WEB3_RPC_URL,
@@ -101,10 +101,10 @@ export const statistic = async (req, res) => {
       status: 0,
     });
 
-    let pending_reward_amount = new BN("0");
+    let pending_reward_amount = BigNumber.from("0");
     for (let i = 0; i < pending_rewards.length; i++) {
       pending_reward_amount = pending_reward_amount.add(
-        new BN(pending_rewards[i].unclaimed_rewards)
+        BigNumber.from(pending_rewards[i].unclaimed_rewards)
       );
     }
 
@@ -113,10 +113,10 @@ export const statistic = async (req, res) => {
       status: 1,
     });
 
-    let claimed_reward_amount = new BN("0");
+    let claimed_reward_amount = BigNumber.from("0");
     for (let i = 0; i < claimed_rewards.length; i++) {
       claimed_reward_amount = claimed_reward_amount.add(
-        new BN(claimed_rewards[i].unclaimed_rewards)
+        BigNumber.from(claimed_rewards[i].unclaimed_rewards)
       );
     }
 
@@ -153,29 +153,26 @@ export const analysis = async (req, res) => {
   let holders = holders_response.data.result;
 
   let total_rewards = await FundsModel.getAll({ status: 0 });
-  let total_reward_amount = new BN("0");
+  let total_reward_amount = BigNumber.from("0");
   for (let i = 0; i < total_rewards.length; i++) {
-    console.log(total_rewards[i].amount);
     total_reward_amount = total_reward_amount.add(
-      new BN(total_rewards[i].amount)
+      BigNumber.from(total_rewards[i].amount)
     );
   }
 
   let claimed_rewards = await RequestsModel.getAll();
-  let claimed_reward_amount = new BN("0");
+  let claimed_reward_amount = BigNumber.from("0");
   for (let i = 0; i < claimed_rewards.length; i++) {
-    console.log(claimed_rewards[i].reward);
     claimed_reward_amount = claimed_reward_amount.add(
-      new BN(claimed_rewards[i].reward)
+      BigNumber.from(claimed_rewards[i].reward)
     );
   }
 
   let unclaimed_rewards = await RewardsModel.getAll({ status: 0 });
-  let unclaimed_reward_amount = new BN("0");
+  let unclaimed_reward_amount = BigNumber.from("0");
   for (let i = 0; i < unclaimed_rewards.length; i++) {
-    console.log(unclaimed_rewards[i].unclaimed_rewards);
     unclaimed_reward_amount = unclaimed_reward_amount.add(
-      new BN(unclaimed_rewards[i].unclaimed_rewards)
+      BigNumber.from(unclaimed_rewards[i].unclaimed_rewards)
     );
   }
 
@@ -196,9 +193,13 @@ export const calculate = async (req, res) => {
     let web3 = new Web3(WEB3_RPC_URL);
 
     let tokenContract = new web3.eth.Contract(ERC20_ABI, P2B_TOKEN_ADDRESS);
-    let total_supply = new BN(web3.utils.toWei(P2B_TOKEN_SUPPLY, "ether"));
-    let max_out_amount = new BN(web3.utils.toWei(P2B_MAX_OUT, "ether"));
-    let min_keep_amount = new BN(web3.utils.toWei(P2B_MIN_KEEP, "ether"));
+    let total_supply = BigNumber.from(
+      web3.utils.toWei(P2B_TOKEN_SUPPLY, "ether")
+    );
+    let max_out_amount = BigNumber.from(web3.utils.toWei(P2B_MAX_OUT, "ether"));
+    let min_keep_amount = BigNumber.from(
+      web3.utils.toWei(P2B_MIN_KEEP, "ether")
+    );
 
     let current_block = await web3.eth.getBlockNumber();
     let previous_block = await FundsModel.getLastBlock();
@@ -218,11 +219,11 @@ export const calculate = async (req, res) => {
     );
     let rewards = rewards_response.data.result;
 
-    let total_reward = new BN(web3.utils.toWei("0", "ether"));
+    let total_reward = BigNumber.from(web3.utils.toWei("0", "ether"));
     for (let i = 0; i < rewards.length; i++) {
       if (rewards[i].methodId != "0x") continue;
 
-      total_reward = total_reward.add(new BN(rewards[i].value));
+      total_reward = total_reward.add(BigNumber.from(rewards[i].value));
     }
 
     FundsModel.add({
@@ -249,7 +250,7 @@ export const calculate = async (req, res) => {
       let holders = holders_response.data.result;
 
       for (let i = 0; i < holders.length; i++) {
-        let holder_balance = new BN(holders[i].TokenHolderQuantity);
+        let holder_balance = BigNumber.from(holders[i].TokenHolderQuantity);
         if (holder_balance.gt(min_keep_amount)) {
           let holder_reward = total_reward
             .mul(holder_balance)
@@ -267,10 +268,10 @@ export const calculate = async (req, res) => {
             block_number: current_block,
           });
 
-          let out_amount = new BN("0");
+          let out_amount = BigNumber.from("0");
           for (let j = 0; j < transferEvents.length; j++) {
             out_amount = out_amount.add(
-              new BN(transferEvents[j].returnValues.value)
+              BigNumber.from(transferEvents[j].returnValues.value)
             );
           }
           if (out_amount.gt(max_out_amount)) {
@@ -305,8 +306,10 @@ export const request = async (req, res) => {
     let web3 = new Web3(WEB3_RPC_URL);
 
     let tokenContract = new web3.eth.Contract(ERC20_ABI, P2B_TOKEN_ADDRESS);
-    let max_out_amount = new BN(web3.utils.toWei(P2B_MAX_OUT, "ether"));
-    let min_keep_amount = new BN(web3.utils.toWei(P2B_MIN_KEEP, "ether"));
+    let max_out_amount = BigNumber.from(web3.utils.toWei(P2B_MAX_OUT, "ether"));
+    let min_keep_amount = BigNumber.from(
+      web3.utils.toWei(P2B_MIN_KEEP, "ether")
+    );
 
     let current_block = await web3.eth.getBlockNumber();
     let previous_block = await FundsModel.getLastBlock();
@@ -323,7 +326,7 @@ export const request = async (req, res) => {
         ETHERSCAN_API_KEY
     );
 
-    let user_balance = new BN(balance_response.data.result);
+    let user_balance = BigNumber.from(balance_response.data.result);
     if (user_balance.gt(min_keep_amount)) {
       let transferEvents = await tokenContract.getPastEvents("Transfer", {
         filter: { from: req.params.address },
@@ -331,10 +334,10 @@ export const request = async (req, res) => {
         toBlock: current_block,
       });
 
-      let out_amount = new BN("0");
+      let out_amount = BigNumber.from("0");
       for (let j = 0; j < transferEvents.length; j++) {
         out_amount = out_amount.add(
-          new BN(transferEvents[j].returnValues.value)
+          BigNumber.from(transferEvents[j].returnValues.value)
         );
       }
 
@@ -352,10 +355,10 @@ export const request = async (req, res) => {
         });
 
         if (pending_rewards.length > 0) {
-          let pending_reward_amount = new BN("0");
+          let pending_reward_amount = BigNumber.from("0");
           for (let i = 0; i < pending_rewards.length; i++) {
             pending_reward_amount = pending_reward_amount.add(
-              new BN(pending_rewards[i].unclaimed_rewards)
+              BigNumber.from(pending_rewards[i].unclaimed_rewards)
             );
           }
 

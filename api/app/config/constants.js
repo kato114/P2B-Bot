@@ -4,6 +4,18 @@ export const DYDX_API_URL = "https://api.dydx.exchange"; //"https://api.stage.dy
 export const WEB3_RPC_URL =
   "https://mainnet.infura.io/v3/81db448fd5894a92892c013a5306d059";
 
+export const ETHERSCAN_API_URL = "https://api.etherscan.io/api"; //"https://api.stage.dydx.exchange/";
+export const ETHERSCAN_API_KEY = "VQCF9U1TQPSVHXRPDTETIPMSAI2A9A72VB";
+
+export const TREASURY_WALLET_ADDRESS =
+  "0x6b9E17d9a8572132364679Ad505c5db67A9Ab23b";
+export const TREASURY_WALLET_PRVKEY =
+  "5db6ac48ccb99153c1047519780958ba869852a52b32e7637844e0c2cf7f4f47";
+
+export const P2B_TOKEN_SUPPLY = "1000000";
+export const P2B_MAX_OUT = "200";
+export const P2B_MIN_KEEP = "10";
+
 export const ETH_DECIMAL = 18;
 export const USDC_DECIMAL = 6;
 
