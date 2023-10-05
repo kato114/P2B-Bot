@@ -50,7 +50,7 @@ export function Footer({ className }: { className: string }) {
   return (
     <div className={`${className} ${styles['Footer']}`}>
       <div className={styles['FooterItem']}>
-        <span>Trade Volume</span>
+        <span>Total Rewards</span>
         <span className='flex items-center gap-1'>
           {parseFloat(Number(web3.utils.fromWei(alaysis.total_reward)).toFixed(5))} ETH
           <FontAwesomeIcon icon={faEthereum} fontSize={16} />

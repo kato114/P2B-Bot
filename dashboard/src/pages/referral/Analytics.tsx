@@ -1,9 +1,27 @@
+import React, { useRef } from "react";
+import { useAccount } from 'wagmi'
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import HolderRewards from './shared/ReferralRewards'
-import styles from './style.module.css'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 
-export default function Referral () {
+import HolderRewards from './shared/ReferralRewards'
+import styles from './style.module.css'
+
+export default function Referral() {
+  const spanRef = useRef<HTMLSpanElement>(null);
+
+  const { address, isConnected } = useAccount()
+
+  const handleCopy = () => {
+    if (spanRef.current) {
+      const range = document.createRange();
+      range.selectNode(spanRef.current);
+      window.getSelection()?.removeAllRanges();
+      window.getSelection()?.addRange(range);
+      document.execCommand("copy");
+    }
+  };
+
   return (
     <div className={styles['MainContent']}>
       <div className={styles['Instructions']}>
@@ -11,11 +29,24 @@ export default function Referral () {
           Referral Rewards
         </span>
         <span className={styles['Details']}>
-          Referral codes are written into every swap transaction and rewards data is processed directly from the blockchain. <br/>
-          Enter the referral code's reward recipient address to check rewards. Rewards data updates every 20 minutes. <br/>
+          Referral codes are written into every swap transaction and rewards data is processed directly from the blockchain. <br />
+          Enter the referral code's reward recipient address to check rewards. Rewards data updates every 20 minutes. <br />
         </span>
       </div>
 
+      <div>
+        <br />
+        {isConnected ?
+          <span className={styles['Details']} onClick={handleCopy} style={{ cursor: "pointer" }}>
+            Referral link : {' '}
+            <span className='text-green-600' ref={spanRef}>
+              https://t.me/P2BHubBot?start={address}
+            </span>
+            {' '}{' '}{' '}
+            <button>&#128203;</button>
+          </span>
+          : <span className={styles['Details']} style={{ color: 'darkred' }}>Connect wallet to see your referral link.</span>}
+      </div>
       <div className='grid grid-cols-4 pt-20 gap-10'>
         <div className='flex flex-col'>
           <span>Total Referrals</span>
@@ -27,15 +58,15 @@ export default function Referral () {
         </div>
         <div className='flex flex-col'>
           <span>Total Rewards</span>
-          <span>0 ETH <FontAwesomeIcon icon={faEthereum}/></span>
+          <span>0 ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
         <div className='flex flex-col'>
           <span>Claimable Rewards</span>
-          <span>0 ETH <FontAwesomeIcon icon={faEthereum}/></span>
+          <span>0 ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
       </div>
 
-      <div className={styles['Divider']}/>
+      <div className={styles['Divider']} />
 
       <HolderRewards />
     </div>

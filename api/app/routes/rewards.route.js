@@ -12,6 +12,7 @@ export const rewardsRouter = (app) => {
   router.post("/process", rewards.process);
   router.post("/calculate", rewards.calculate);
   router.post("/request/:address", rewards.request);
+  router.post("/referral/:tgId/:address", rewards.referral);
 
   app.use("/api/rewards", router);
 };

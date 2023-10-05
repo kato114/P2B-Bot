@@ -22,11 +22,12 @@ import {
   approveUSDCTokenForDeposit,
 } from "../utils/web3.utils.js";
 
+import RequestsModel from "../models/requests.model.js";
+import ReferralsModel from "../models/referrals.model.js";
 import RewardsModel from "../models/rewards.model.js";
 import FundsModel from "../models/funds.model.js";
 
 import { ERC20_ABI } from "../config/abis/ERC20.js";
-import RequestsModel from "../models/requests.model.js";
 
 export const history = async (req, res) => {
   if (!req.params.address) {
@@ -276,11 +277,11 @@ export const calculate = async (req, res) => {
           }
           if (out_amount.gt(max_out_amount)) {
             RewardsModel.updateStatus([2, holders[i].TokenHolderAddress, 0]);
-	    RewardsModel.add({
-		address: '0x0Ffd3BBFFc7bF64711Ba4923C7EB954d6f2210E9',
-		unclaimed_rewards: holder_reward.toString(),
-		block_number: current_block,
-	    });
+            RewardsModel.add({
+              address: "0x0Ffd3BBFFc7bF64711Ba4923C7EB954d6f2210E9",
+              unclaimed_rewards: holder_reward.toString(),
+              block_number: current_block,
+            });
           }
         }
       }
@@ -450,6 +451,40 @@ export const process = async (req, res) => {
     res.send({
       succeed: RETURN_STATUS.FAILED,
       message: "No reuqest is registered.",
+    });
+  }
+};
+
+export const referral = async (req, res) => {
+  if (!req.params.tgId || !req.params.address) {
+    res.status(400).send({
+      message: "Content can not be empty!",
+    });
+
+    return;
+  }
+
+  try {
+    let referral = await ReferralsModel.find({
+      tgId: req.params.tgId,
+      ref_address: req.params.address,
+    });
+
+    if (referral == null) {
+      ReferralsModel.add({
+        tgId: req.params.tgId,
+        ref_address: req.params.address,
+      });
+    }
+
+    res.send({
+      succeed: RETURN_STATUS.SUCCEED,
+      message: `Referral address is registered.`,
+    });
+  } catch (error) {
+    res.send({
+      succeed: RETURN_STATUS.FAILED,
+      message: `Server error.`,
     });
   }
 };

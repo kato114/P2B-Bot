@@ -47,7 +47,7 @@ export default function Analytics() {
         </span>
         <span className={styles['Details']}>
           Holders receive 1% of token swap fees (2% for those who migrated on-time), 40% of transaction fees, and 25% of referral fees as rewards. <br />
-          Rewards are proportional to the amount of Perpbot held. Rewards are calculated in 2 hour intervals and are claimable after 24 hours. <br />
+          Rewards are proportional to the amount of Perpbot held. Rewards are calculated in 2 hour intervals. <br />
         </span>
       </div>
 
