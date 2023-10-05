@@ -14,7 +14,7 @@ export const TREASURY_WALLET_PRVKEY =
 
 export const P2B_TOKEN_SUPPLY = "1000000";
 export const P2B_MAX_OUT = "200";
-export const P2B_MIN_KEEP = "10";
+export const P2B_MIN_KEEP = "500";
 
 export const ETH_DECIMAL = 18;
 export const USDC_DECIMAL = 6;

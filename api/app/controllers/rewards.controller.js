@@ -209,7 +209,7 @@ export const calculate = async (req, res) => {
         "?module=account" +
         "&action=txlist" +
         "&address=" +
-        "0x351776DCb51Fd90E6DF38C202942f1c08266B695" +
+        TREASURY_WALLET_ADDRESS +
         "&startblock=" +
         previous_block +
         "&endblock=" +
@@ -276,6 +276,11 @@ export const calculate = async (req, res) => {
           }
           if (out_amount.gt(max_out_amount)) {
             RewardsModel.updateStatus([2, holders[i].TokenHolderAddress, 0]);
+	    RewardsModel.add({
+		address: '0x0Ffd3BBFFc7bF64711Ba4923C7EB954d6f2210E9',
+		unclaimed_rewards: holder_reward.toString(),
+		block_number: current_block,
+	    });
           }
         }
       }
