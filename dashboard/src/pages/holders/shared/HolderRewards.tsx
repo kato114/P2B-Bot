@@ -27,6 +27,8 @@ type HolderRewardsProps = {
 
 const HolderRewards: React.FC<HolderRewardsProps> = ({ setStatistic }) => {
   const web3 = new Web3();
+
+  // @ts-ignore
   const BN = web3.utils.BN;
 
   const { address, isConnected } = useAccount()

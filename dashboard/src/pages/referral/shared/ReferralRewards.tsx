@@ -27,6 +27,7 @@ type ReferralRewardsProps = {
 
 const ReferralRewards: React.FC<ReferralRewardsProps> = ({ setStatistic }) => {
   const web3 = new Web3();
+  // @ts-ignore
   const BN = web3.utils.BN;
 
   const { address, isConnected } = useAccount()

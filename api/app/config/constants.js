@@ -22,7 +22,7 @@ export const ETH_DECIMAL = 18;
 export const USDC_DECIMAL = 6;
 
 export const DEPOSIT_FEE = 4; // percent
-export const REFERRAL_FEE = 20; // percent
+export const REFERRAL_FEE = 40; // percent
 
 export const RETURN_STATUS = {
   SUCCEED: true,
