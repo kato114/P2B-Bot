@@ -15,22 +15,16 @@ import styles from './style.module.css'
 
 type Alaysis = {
   holder_count: string,
+  referred_count: string,
   total_reward: string,
   total_claimed_reward: string,
   total_unclaimed_reward: string
 };
 
 export function Footer({ className }: { className: string }) {
-  const {
-    tradeVolume,
-    holderRewards,
-    totalHolders,
-    referredUsers
-  } = useContext(P2BContext);
-
-
   const [alaysis, setAlaysis] = useState<Alaysis>({
     holder_count: '0',
+    referred_count: '0',
     total_reward: '0',
     total_claimed_reward: '0',
     total_unclaimed_reward: '0'
@@ -77,9 +71,9 @@ export function Footer({ className }: { className: string }) {
       </div>
       <div className={styles['FooterItem']}>
         <span>Referred Users</span>
-        <span>{referredUsers}</span>
+        <span>{alaysis.referred_count}</span>
       </div>
-      <a className={styles['FooterContact']} href="#" target='_blank'>
+      <a className={styles['FooterContact']} href="https://t.me/perpbot_p2b" target='_blank'>
         <span><FontAwesomeIcon icon={faTelegram} fontSize={16} /></span>
         <span >Join the Community</span>
       </a>

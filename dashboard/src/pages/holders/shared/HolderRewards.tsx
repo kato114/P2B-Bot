@@ -11,11 +11,23 @@ type Reward = {
   updated_date: string;
   unclaimed_rewards: number;
   block_number: string;
+  type: number;
   status: number;
 };
 
-export default function HolderRewards() {
+type Statistic = {
+  total_reward: string;
+  claimed_reward: string;
+  unclaimed_reward: string;
+};
+
+type HolderRewardsProps = {
+  setStatistic: React.Dispatch<React.SetStateAction<Statistic>>;
+};
+
+const HolderRewards: React.FC<HolderRewardsProps> = ({ setStatistic }) => {
   const web3 = new Web3();
+  const BN = web3.utils.BN;
 
   const { address, isConnected } = useAccount()
   const [rewards, setRewards] = useState<Reward[]>([])
@@ -26,6 +38,26 @@ export default function HolderRewards() {
         let { data } = await axios.get(API_URL + "/history/" + address);
 
         setRewards(data.data)
+
+        let total_reward = new BN(0);
+        let claimed_reward = new BN(0);
+        let unclaimed_reward = new BN(0);
+        for (let i = 0; i < data.data.length; i++) {
+          if (data.data[i].type == 0) {
+            total_reward = total_reward.add(new BN(data.data[i].unclaimed_rewards));
+            if (data.data[i].status == 0) {
+              unclaimed_reward = unclaimed_reward.add(new BN(data.data[i].unclaimed_rewards));
+            } else if (data.data[i].status == 1) {
+              claimed_reward = claimed_reward.add(new BN(data.data[i].unclaimed_rewards));
+            }
+          }
+        }
+
+        setStatistic({
+          total_reward: total_reward.toString(),
+          claimed_reward: claimed_reward.toString(),
+          unclaimed_reward: unclaimed_reward.toString(),
+        })
       }
     }
 
@@ -47,6 +79,7 @@ export default function HolderRewards() {
         </thead>
         <tbody>
           {rewards.map((data => (
+            data.type == 0 &&
             <tr className={styles['TableBodyRow']}>
               <td>{data.block_number}</td>
               <td align='center'>{data.updated_date.substring(0, 16).replace('T', ' ')}</td>
@@ -63,3 +96,5 @@ export default function HolderRewards() {
     </div>
   )
 }
+
+export default HolderRewards;

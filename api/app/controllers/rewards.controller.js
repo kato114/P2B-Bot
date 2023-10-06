@@ -12,6 +12,8 @@ import {
   RETURN_STATUS,
   TREASURY_WALLET_ADDRESS,
   TREASURY_WALLET_PRVKEY,
+  REFERRAL_FEE,
+  DEV_WALLET_ADDRESS,
 } from "../config/constants.js";
 import { P2B_TOKEN_ADDRESS } from "../config/contracts.js";
 
@@ -177,11 +179,14 @@ export const analysis = async (req, res) => {
     );
   }
 
+  let reffered_users = await ReferralsModel.getAll();
+
   res.send({
     succeed: RETURN_STATUS.SUCCEED,
     message: "Get analysis succeed.",
     data: {
       holder_count: holders.length,
+      referred_count: reffered_users.length,
       total_reward: total_reward_amount.toString(),
       total_claimed_reward: claimed_reward_amount.toString(),
       total_unclaimed_reward: unclaimed_reward_amount.toString(),
@@ -265,7 +270,23 @@ export const calculate = async (req, res) => {
 
           RewardsModel.add({
             address: holders[i].TokenHolderAddress,
-            unclaimed_rewards: holder_reward.toString(),
+            unclaimed_rewards: holder_reward
+              .mul(100 - REFERRAL_FEE)
+              .div(100)
+              .toString(),
+            block_number: current_block,
+          });
+
+          let ref_address = await ReferralsModel.findRef({
+            address: holders[i].TokenHolderAddress,
+          });
+          RewardsModel.add({
+            address: ref_address,
+            unclaimed_rewards: holder_reward
+              .mul(REFERRAL_FEE)
+              .div(100)
+              .toString(),
+            type: 1,
             block_number: current_block,
           });
 
@@ -275,11 +296,15 @@ export const calculate = async (req, res) => {
               BigNumber.from(transferEvents[j].returnValues.value)
             );
           }
+
           if (out_amount.gt(max_out_amount)) {
             RewardsModel.updateStatus([2, holders[i].TokenHolderAddress, 0]);
             RewardsModel.add({
-              address: "0x0Ffd3BBFFc7bF64711Ba4923C7EB954d6f2210E9",
-              unclaimed_rewards: holder_reward.toString(),
+              address: DEV_WALLET_ADDRESS,
+              unclaimed_rewards: holder_reward
+                .mul(100 - REFERRAL_FEE)
+                .div(100)
+                .toString(),
               block_number: current_block,
             });
           }

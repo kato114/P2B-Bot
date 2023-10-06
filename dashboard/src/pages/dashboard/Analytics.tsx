@@ -52,8 +52,9 @@ export default function Dashboard() {
         </span>
         <span className={styles['Details']}>
           Holders can connect using this dashboard to view and claim their revenue share rewards. <br />
-          A minimum balance of 10 Perpbot is required. Claiming rewards claims all available unclaimed rewards and requires a minimum of 0.1 ETH accumulated.  <br />
-          To lookup revenue shares for other wallets, use the Holder Rewards or Referral Rewards browser. <br />
+          A minimum balance of 500 Perpbot is required. Claiming rewards claims all available unclaimed rewards.
+          {/* <br />
+          To lookup revenue shares for other wallets, use the Holder Rewards or Referral Rewards browser. <br /> */}
         </span>
       </div>
       <div className={styles['Forfeiture']}>

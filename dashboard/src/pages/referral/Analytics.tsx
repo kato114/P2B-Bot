@@ -1,5 +1,6 @@
-import React, { useRef } from "react";
+import React, { useRef, useState } from "react";
 import { useAccount } from 'wagmi'
+import Web3 from 'web3'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
@@ -7,11 +8,23 @@ import { faEthereum } from '@fortawesome/free-brands-svg-icons'
 import HolderRewards from './shared/ReferralRewards'
 import styles from './style.module.css'
 
-export default function Referral() {
-  const spanRef = useRef<HTMLSpanElement>(null);
+type Statistic = {
+  total_reward: string;
+  claimed_reward: string;
+  unclaimed_reward: string;
+};
 
+export default function Referral() {
+  const web3 = new Web3();
   const { address, isConnected } = useAccount()
 
+  const [statistic, setStatistic] = useState<Statistic>({
+    total_reward: '0',
+    claimed_reward: '0',
+    unclaimed_reward: '0',
+  })
+
+  const spanRef = useRef<HTMLSpanElement>(null);
   const handleCopy = () => {
     if (spanRef.current) {
       const range = document.createRange();
@@ -47,28 +60,24 @@ export default function Referral() {
           </span>
           : <span className={styles['Details']} style={{ color: 'darkred' }}>Connect wallet to see your referral link.</span>}
       </div>
-      <div className='grid grid-cols-4 pt-20 gap-10'>
-        <div className='flex flex-col'>
-          <span>Total Referrals</span>
-          <span>--</span>
-        </div>
-        <div className='flex flex-col'>
-          <span>Transactions</span>
-          <span>--</span>
-        </div>
+      <div className='grid grid-cols-3 pt-20 gap-10'>
         <div className='flex flex-col'>
           <span>Total Rewards</span>
-          <span>0 ETH <FontAwesomeIcon icon={faEthereum} /></span>
+          <span>{parseFloat(Number(web3.utils.fromWei(statistic.total_reward)).toFixed(5))} ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
         <div className='flex flex-col'>
-          <span>Claimable Rewards</span>
-          <span>0 ETH <FontAwesomeIcon icon={faEthereum} /></span>
+          <span>Unclaimed Rewards</span>
+          <span>{parseFloat(Number(web3.utils.fromWei(statistic.unclaimed_reward)).toFixed(5))} ETH <FontAwesomeIcon icon={faEthereum} /></span>
+        </div>
+        <div className='flex flex-col'>
+          <span>Claimed Rewards</span>
+          <span>{parseFloat(Number(web3.utils.fromWei(statistic.claimed_reward)).toFixed(5))} ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
       </div>
 
       <div className={styles['Divider']} />
 
-      <HolderRewards />
+      <HolderRewards setStatistic={setStatistic} />
     </div>
   )
 }

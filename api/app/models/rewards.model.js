@@ -7,6 +7,7 @@ class RewardsModel {
     this.address = user.address;
     this.unclaimed_rewards = user.unclaimed_rewards;
     this.block_number = user.block_number;
+    this.type = user.type;
     this.status = user.status;
   }
 

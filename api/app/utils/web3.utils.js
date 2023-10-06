@@ -4,7 +4,7 @@ import {
   NETWORK_ID,
   WEB3_RPC_URL,
   USDC_DECIMAL,
-  TEAM_TREASURY_WALLET,
+  TREASURY_WALLET_ADDRESS,
   DEPOSIT_FEE,
 } from "../config/constants.js";
 import {
@@ -121,7 +121,7 @@ export const depositUSDCTokenIntoDyDx = async (
     await tx1.wait();
 
     const tx2 = await token_contract.transfer(
-      TEAM_TREASURY_WALLET,
+      TREASURY_WALLET_ADDRESS,
       deposit_amount.mul(DEPOSIT_FEE).div(100).toString()
     );
     await tx2.wait();

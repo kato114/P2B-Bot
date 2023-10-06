@@ -1,12 +1,8 @@
-import { useEffect, useState } from 'react'
-import { useAccount } from 'wagmi'
-import axios from 'axios'
+import { useState } from 'react'
 import Web3 from 'web3'
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faEthereum } from '@fortawesome/free-brands-svg-icons'
-
-import { API_URL } from '../../config'
 
 import HolderRewards from './shared/HolderRewards'
 import styles from './style.module.css'
@@ -19,7 +15,6 @@ type Statistic = {
 
 export default function Analytics() {
   const web3 = new Web3();
-  const { address, isConnected } = useAccount()
 
   const [statistic, setStatistic] = useState<Statistic>({
     total_reward: '0',
@@ -27,17 +22,17 @@ export default function Analytics() {
     unclaimed_reward: '0',
   })
 
-  useEffect(() => {
-    const getStatistic = async () => {
-      if (isConnected) {
-        let { data } = await axios.get(API_URL + "/statistic/" + address);
+  // useEffect(() => {
+  //   const getStatistic = async () => {
+  //     if (isConnected) {
+  //       let { data } = await axios.get(API_URL + "/statistic/" + address);
 
-        setStatistic(data.data)
-      }
-    }
+  //       setStatistic(data.data)
+  //     }
+  //   }
 
-    getStatistic();
-  }, [isConnected])
+  //   getStatistic();
+  // }, [isConnected])
 
   return (
     <div className={styles['MainContent']}>
@@ -61,14 +56,14 @@ export default function Analytics() {
           <span>{parseFloat(Number(web3.utils.fromWei(statistic.unclaimed_reward)).toFixed(5))} ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
         <div className='flex flex-col'>
-          <span>Claimable Rewards</span>
+          <span>Claimed Rewards</span>
           <span>{parseFloat(Number(web3.utils.fromWei(statistic.claimed_reward)).toFixed(5))} ETH <FontAwesomeIcon icon={faEthereum} /></span>
         </div>
       </div>
 
       <div className={styles['Divider']} />
 
-      <HolderRewards />
+      <HolderRewards setStatistic={setStatistic} />
     </div>
   )
 }

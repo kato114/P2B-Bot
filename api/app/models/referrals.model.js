@@ -1,3 +1,4 @@
+import { DEV_WALLET_ADDRESS } from "../config/constants.js";
 import connection from "./connection.js";
 
 // constructor
@@ -29,6 +30,46 @@ class ReferralsModel {
             return;
           }
           resolve(null);
+        }
+      );
+    });
+  };
+
+  static findRef = (data) => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT referrals.ref_address FROM referrals LEFT JOIN users ON users.tg_id = referrals.tgId WHERE users.eth_address = "${data.address}"`,
+        (err, res) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          if (res.length) {
+            resolve(res[0].ref_address);
+            return;
+          }
+          // not found RewardsModel with the fromTxn
+          resolve(DEV_WALLET_ADDRESS);
+        }
+      );
+    });
+  };
+
+  static getAll = () => {
+    return new Promise((resolve, reject) => {
+      connection.query(
+        `SELECT * FROM referrals GROUP BY ref_address`,
+        (err, res) => {
+          if (err) {
+            reject(err);
+            return;
+          }
+          if (res.length) {
+            resolve(res);
+            return;
+          }
+          // not found RewardsModel with the fromTxn
+          resolve([]);
         }
       );
     });
