@@ -58,7 +58,7 @@ class ReferralsModel {
   static getAll = () => {
     return new Promise((resolve, reject) => {
       connection.query(
-        `SELECT * FROM referrals GROUP BY ref_address`,
+        `SELECT ref_address FROM referrals GROUP BY ref_address`,
         (err, res) => {
           if (err) {
             reject(err);
